@@ -2,6 +2,7 @@ import { PrismaClient } from "@prisma/client";
 import { hash } from "bcryptjs";
 import { isDatabaseUnavailableError } from "../lib/database-error";
 import { seedInnovationTrackCourses } from "./seed-innovation-track";
+import { seedPDPProgram } from "./seed-pdp-program";
 
 const prisma = new PrismaClient();
 
@@ -1291,6 +1292,7 @@ Files must be legible. Instructor approval is required before this lesson can be
   }
 
   await seedInnovationTrackCourses(prisma, instructor.id, student.id);
+  await seedPDPProgram(prisma);
 
   console.log("Seed complete.");
   console.log("  admin@unipod.local / instructor@unipod.local / student@unipod.local");

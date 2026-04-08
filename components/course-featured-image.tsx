@@ -2,7 +2,8 @@ type Variant = "card" | "hero" | "list" | "sidebar";
 
 const variantClass: Record<Variant, string> = {
   card: "aspect-[16/10] w-full overflow-hidden rounded-t-2xl bg-slate-100 dark:bg-slate-800",
-  hero: "aspect-[21/9] max-h-80 w-full overflow-hidden rounded-2xl bg-slate-100 dark:bg-slate-800",
+  hero:
+    "aspect-[21/9] min-h-[12rem] w-full max-h-[22rem] overflow-hidden bg-slate-100 dark:bg-slate-800",
   list: "h-14 w-[5.5rem] shrink-0 overflow-hidden rounded-lg bg-slate-100 dark:bg-slate-800",
   sidebar:
     "aspect-video w-full max-h-40 overflow-hidden rounded-xl bg-slate-100 dark:bg-slate-800",

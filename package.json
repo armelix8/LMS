@@ -16,6 +16,9 @@
     "postinstall": "prisma generate"
   },
   "dependencies": {
+    "@blocknote/ariakit": "^0.47.3",
+    "@blocknote/core": "^0.47.3",
+    "@blocknote/react": "^0.47.3",
     "@prisma/client": "^6.19.0",
     "@tailwindcss/typography": "^0.5.19",
     "@uiw/react-md-editor": "^4.1.0",

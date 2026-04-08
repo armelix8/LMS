@@ -71,6 +71,24 @@ export default async function NewProgramPage({
               placeholder="Who the program is for, duration, expectations…"
             />
           </div>
+          <div>
+            <label
+              htmlFor="coverImageUrl"
+              className="block text-sm font-medium text-slate-800 dark:text-slate-200"
+            >
+              Cover image URL (optional)
+            </label>
+            <input
+              id="coverImageUrl"
+              name="coverImageUrl"
+              type="url"
+              className={inputClass}
+              placeholder="/images/programs/example.png"
+            />
+            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+              Public path under <code className="rounded bg-slate-100 px-1 dark:bg-slate-800">/public</code> or HTTPS.
+            </p>
+          </div>
           <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-slate-200 bg-slate-50/80 px-4 py-3 dark:border-slate-700 dark:bg-slate-950/40">
             <input
               type="checkbox"

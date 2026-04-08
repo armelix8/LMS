@@ -15,6 +15,12 @@ import {
 } from "@/lib/image-upload";
 import { createNotification } from "@/lib/notifications";
 import { prisma } from "@/lib/prisma";
+import {
+  canonicalizeBlockNoteForStorage,
+  extractFirstVideoUrlFromBlocks,
+  isBlockNoteContent,
+  parseBlockNoteDocument,
+} from "@/lib/lesson-blocknote";
 import { uniqueCourseSlug } from "@/lib/slug";
 import { NotificationType } from "@prisma/client";
 
@@ -386,12 +392,31 @@ export async function updateLesson(
     return;
   }
 
+  const contentToPersist = data.content;
+  const canonicalBlockNote =
+    contentToPersist != null
+      ? canonicalizeBlockNoteForStorage(contentToPersist)
+      : null;
+  const contentForDb =
+    canonicalBlockNote != null ? canonicalBlockNote : contentToPersist;
+
+  const blockDerivedVideo =
+    contentToPersist != null && isBlockNoteContent(contentToPersist)
+      ? extractFirstVideoUrlFromBlocks(
+          parseBlockNoteDocument(contentToPersist) ?? [],
+        )
+      : undefined;
+
   await prisma.lesson.update({
     where: { id: lessonId },
     data: {
       ...(data.title != null ? { title: data.title } : {}),
-      ...(data.content != null ? { content: data.content } : {}),
-      ...(data.videoUrl !== undefined ? { videoUrl: data.videoUrl || null } : {}),
+      ...(contentForDb != null ? { content: contentForDb } : {}),
+      ...(blockDerivedVideo !== undefined
+        ? { videoUrl: blockDerivedVideo }
+        : data.videoUrl !== undefined
+          ? { videoUrl: data.videoUrl || null }
+          : {}),
     },
   });
 

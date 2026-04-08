@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { auth } from "@/auth";
 import { CourseFeaturedImage } from "@/components/course-featured-image";
+import { instructorPrimaryButtonClass } from "@/components/instructor-page-chrome";
 import { prisma } from "@/lib/prisma";
 
 export const metadata = { title: "Courses" };
@@ -8,6 +9,10 @@ export const metadata = { title: "Courses" };
 export default async function CoursesPage() {
   const session = await auth();
   const userId = session?.user?.id;
+  const role = session?.user?.role;
+  const isAdmin = role === "ADMIN";
+  const canOpenInstructorConsole =
+    role === "INSTRUCTOR" || role === "ADMIN";
 
   const courses = await prisma.course.findMany({
     where: { published: true },
@@ -48,17 +53,33 @@ export default async function CoursesPage() {
 
   return (
     <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-10 sm:px-6">
-      <h1 className="text-3xl font-bold text-slate-900 dark:text-white">
-        Course catalog
-      </h1>
-      <p className="mt-2 max-w-2xl text-slate-600 dark:text-slate-400">
-        Published programs open for enrollment. Sign in to join a course and
-        track your progress. Your own courses show instructor shortcuts.
-      </p>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div className="min-w-0">
+          <h1 className="text-3xl font-bold text-slate-900 dark:text-white">
+            Course catalog
+          </h1>
+          <p className="mt-2 max-w-2xl text-slate-600 dark:text-slate-400">
+            Published programs open for enrollment. Sign in to join a course and
+            track your progress.
+            {canOpenInstructorConsole
+              ? " Use the button to open your instructor tools."
+              : " Instructors see shortcuts on courses they teach."}
+          </p>
+        </div>
+        {canOpenInstructorConsole ? (
+          <Link
+            href="/instructor/courses"
+            className={`${instructorPrimaryButtonClass} shrink-0 whitespace-nowrap shadow-md`}
+          >
+            {isAdmin ? "Manage all courses" : "Manage your courses"}
+          </Link>
+        ) : null}
+      </div>
 
       <ul className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {courses.map((course) => {
-          const isOwner = userId && course.instructorId === userId;
+          const isOwner = Boolean(userId && course.instructorId === userId);
+          const canManageThisCourse = isOwner || isAdmin;
           const lessons = course.modules.reduce(
             (n, m) => n + m.lessons.length,
             0,
@@ -81,7 +102,7 @@ export default async function CoursesPage() {
             <li key={course.id}>
               <div
                 className={`flex h-full flex-col overflow-hidden rounded-2xl border bg-white shadow-sm transition hover:shadow-md dark:bg-slate-900/50 ${
-                  isOwner
+                  canManageThisCourse
                     ? "border-violet-200 hover:border-violet-300 dark:border-violet-900 dark:hover:border-violet-800"
                     : "border-slate-200 hover:border-indigo-200 dark:border-slate-800 dark:hover:border-indigo-900"
                 }`}
@@ -104,6 +125,11 @@ export default async function CoursesPage() {
                         Your course
                       </span>
                     )}
+                    {isAdmin && !isOwner && (
+                      <span className="rounded-full bg-slate-200 px-2 py-0.5 text-xs font-semibold text-slate-800 dark:bg-slate-700 dark:text-slate-100">
+                        Admin
+                      </span>
+                    )}
                   </div>
                   <p className="mt-2 line-clamp-3 flex-1 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
                     {course.description}
@@ -115,7 +141,7 @@ export default async function CoursesPage() {
                     <span>{lessons} lessons</span>
                   </div>
                 </Link>
-                {isOwner && (
+                {canManageThisCourse && (
                   <div className="border-t border-violet-100 px-6 py-3 dark:border-violet-900/50">
                     <div className="flex flex-wrap gap-x-4 gap-y-2 text-sm">
                       <Link

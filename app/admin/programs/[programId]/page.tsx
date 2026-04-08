@@ -100,6 +100,21 @@ export default async function AdminProgramDetailPage({
               className={inputClass}
             />
           </div>
+          <div>
+            <label className="block text-sm font-medium text-slate-800 dark:text-slate-200">
+              Cover image URL (optional)
+            </label>
+            <input
+              name="coverImageUrl"
+              type="url"
+              placeholder="/images/programs/your-cover.png"
+              defaultValue={program.coverImageUrl ?? ""}
+              className={inputClass}
+            />
+            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+              Site path starting with <code className="rounded bg-slate-100 px-1 dark:bg-slate-800">/</code> or HTTPS. Leave blank for the gradient initial.
+            </p>
+          </div>
           <label className="flex cursor-pointer items-center gap-3">
             <input
               type="checkbox"

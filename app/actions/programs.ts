@@ -47,13 +47,15 @@ export async function createProgram(formData: FormData): Promise<void> {
   await requireAdmin();
   const title = String(formData.get("title") ?? "").trim();
   const description = String(formData.get("description") ?? "").trim();
+  const coverImageUrl =
+    String(formData.get("coverImageUrl") ?? "").trim() || null;
   const published = formData.get("published") === "on";
   if (!title || !description) {
     redirect("/admin/programs/new?error=required");
   }
   const slug = await uniqueProgramSlug(title);
   const program = await prisma.program.create({
-    data: { title, slug, description, published },
+    data: { title, slug, description, published, coverImageUrl },
   });
   revalidatePath("/admin/programs");
   redirect(`/admin/programs/${program.id}`);
@@ -63,6 +65,8 @@ export async function updateProgram(programId: string, formData: FormData): Prom
   await requireAdmin();
   const title = String(formData.get("title") ?? "").trim();
   const description = String(formData.get("description") ?? "").trim();
+  const coverImageUrl =
+    String(formData.get("coverImageUrl") ?? "").trim() || null;
   const published = formData.get("published") === "on";
   if (!title || !description) return;
 
@@ -76,7 +80,7 @@ export async function updateProgram(programId: string, formData: FormData): Prom
 
   await prisma.program.update({
     where: { id: programId },
-    data: { title, description, published, slug },
+    data: { title, description, published, slug, coverImageUrl },
   });
   revalidatePath("/admin/programs");
   revalidatePath(`/admin/programs/${programId}`);

@@ -9,6 +9,20 @@ import {
   updateCourse,
 } from "@/app/actions/lms";
 import { CourseFeaturedImage } from "@/components/course-featured-image";
+import {
+  InstructorBreadcrumbs,
+  InstructorPageShell,
+  instructorCalloutClass,
+  instructorCardClass,
+  instructorFileInputClass,
+  instructorHintClass,
+  instructorInputClass,
+  instructorLabelClass,
+  instructorPrimaryButtonClass,
+  instructorSecondaryButtonClass,
+  instructorStatCardClass,
+  instructorTextareaClass,
+} from "@/components/instructor-page-chrome";
 import { DeleteCourseForm } from "./delete-course-form";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
@@ -143,55 +157,76 @@ export default async function EditCoursePage({ params, searchParams }: Props) {
   }
 
   return (
-    <main className="mx-auto w-full max-w-4xl flex-1 px-4 py-10 sm:px-6">
-      <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
-        <Link href="/instructor/courses" className="hover:text-indigo-600 dark:hover:text-indigo-400">
-          Courses
-        </Link>
-        <span>/</span>
-        <span>Edit</span>
-      </div>
+    <InstructorPageShell maxWidthClass="max-w-5xl">
+      <InstructorBreadcrumbs
+        items={[
+          { href: "/instructor/courses", label: "Courses" },
+          { label: course.title },
+        ]}
+      />
 
       {courseImageError && (
         <p
-          className="mt-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950 dark:border-amber-900/50 dark:bg-amber-950/40 dark:text-amber-100"
+          className="mt-6 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950 dark:border-amber-900/50 dark:bg-amber-950/40 dark:text-amber-100"
           role="alert"
         >
           {courseImageError}
         </p>
       )}
 
-      <div className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div className="flex min-w-0 flex-1 flex-col gap-4 sm:flex-row sm:items-start">
+      <div className="mt-6 flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+        <div className="flex min-w-0 flex-1 gap-5">
           <CourseFeaturedImage
             src={course.thumbnail}
             alt={`${course.title} cover`}
             variant="list"
-            className="sm:mt-1"
+            className="shrink-0 sm:mt-0.5"
           />
-          <h1 className="min-w-0 text-3xl font-bold text-slate-900 dark:text-white">
-            {course.title}
-          </h1>
+          <div className="min-w-0 pt-0.5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">
+              Course
+            </p>
+            <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-[2rem] sm:leading-tight">
+              {course.title}
+            </h1>
+            <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-slate-600 dark:text-slate-400">
+              <span
+                className={
+                  course.published
+                    ? "inline-flex items-center rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-semibold text-emerald-900 dark:bg-emerald-950/50 dark:text-emerald-200"
+                    : "inline-flex items-center rounded-full bg-slate-200 px-2.5 py-0.5 text-xs font-semibold text-slate-800 dark:bg-slate-700 dark:text-slate-200"
+                }
+              >
+                {course.published ? "Published" : "Draft"}
+              </span>
+              <span className="text-slate-300 dark:text-slate-600" aria-hidden>
+                ·
+              </span>
+              <span className="font-mono text-xs text-slate-500 dark:text-slate-500">
+                /courses/{course.slug}
+              </span>
+            </div>
+          </div>
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2 lg:justify-end">
           <Link
             href={`/instructor/courses/${id}/students`}
-            className="rounded-lg border border-indigo-200 bg-indigo-50 px-3 py-1.5 text-sm font-medium text-indigo-800 hover:bg-indigo-100 dark:border-indigo-900 dark:bg-indigo-950/50 dark:text-indigo-200 dark:hover:bg-indigo-950"
+            className={`${instructorSecondaryButtonClass} border-indigo-200 bg-indigo-50/90 text-indigo-900 hover:bg-indigo-100 dark:border-indigo-900/60 dark:bg-indigo-950/40 dark:text-indigo-100 dark:hover:bg-indigo-950/70`}
           >
-            Students & progress
+            Students
           </Link>
           {course.published && (
             <>
               <Link
                 href={`/courses/${course.slug}`}
-                className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-800 hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800"
+                className={instructorSecondaryButtonClass}
               >
-                Catalog preview
+                Catalog
               </Link>
               {lessonCount > 0 && (
                 <Link
                   href={`/learn/${course.slug}`}
-                  className="rounded-lg border border-indigo-200 bg-indigo-50 px-3 py-1.5 text-sm font-medium text-indigo-800 hover:bg-indigo-100 dark:border-indigo-900 dark:bg-indigo-950/50 dark:text-indigo-200 dark:hover:bg-indigo-950"
+                  className={`${instructorSecondaryButtonClass} border-indigo-200 bg-indigo-50/90 text-indigo-900 hover:bg-indigo-100 dark:border-indigo-900/60 dark:bg-indigo-950/40 dark:text-indigo-100 dark:hover:bg-indigo-950/70`}
                 >
                   Learner view
                 </Link>
@@ -201,36 +236,36 @@ export default async function EditCoursePage({ params, searchParams }: Props) {
         </div>
       </div>
 
-      <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-xl border border-slate-200 bg-white px-4 py-3 dark:border-slate-800 dark:bg-slate-900/50">
-          <p className="text-xs font-medium uppercase text-slate-500 dark:text-slate-400">
+      <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className={instructorStatCardClass}>
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
             Structure
           </p>
-          <p className="mt-1 text-lg font-semibold text-slate-900 dark:text-white">
+          <p className="mt-1.5 text-lg font-semibold tabular-nums text-slate-900 dark:text-white">
             {course.modules.length} modules · {lessonCount} lessons
           </p>
         </div>
-        <div className="rounded-xl border border-slate-200 bg-white px-4 py-3 dark:border-slate-800 dark:bg-slate-900/50">
-          <p className="text-xs font-medium uppercase text-slate-500 dark:text-slate-400">
+        <div className={instructorStatCardClass}>
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
             Quizzes
           </p>
-          <p className="mt-1 text-lg font-semibold text-slate-900 dark:text-white">
+          <p className="mt-1.5 text-lg font-semibold tabular-nums text-slate-900 dark:text-white">
             {quizCount} configured
           </p>
         </div>
-        <div className="rounded-xl border border-slate-200 bg-white px-4 py-3 dark:border-slate-800 dark:bg-slate-900/50">
-          <p className="text-xs font-medium uppercase text-slate-500 dark:text-slate-400">
+        <div className={instructorStatCardClass}>
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
             Assignments
           </p>
-          <p className="mt-1 text-lg font-semibold text-slate-900 dark:text-white">
+          <p className="mt-1.5 text-lg font-semibold tabular-nums text-slate-900 dark:text-white">
             {assignmentCount} configured
           </p>
         </div>
-        <div className="rounded-xl border border-slate-200 bg-white px-4 py-3 dark:border-slate-800 dark:bg-slate-900/50">
-          <p className="text-xs font-medium uppercase text-slate-500 dark:text-slate-400">
+        <div className={instructorStatCardClass}>
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
             Reviews
           </p>
-          <p className="mt-1 text-lg font-semibold text-slate-900 dark:text-white">
+          <p className="mt-1.5 text-lg font-semibold tabular-nums text-slate-900 dark:text-white">
             {pendingReviewTotal} submission
             {pendingReviewTotal === 1 ? "" : "s"} pending
           </p>
@@ -295,27 +330,33 @@ export default async function EditCoursePage({ params, searchParams }: Props) {
         </section>
       )}
 
-      <p className="mt-6 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600 dark:border-slate-800 dark:bg-slate-900/40 dark:text-slate-300">
+      <p className={`mt-8 ${instructorCalloutClass}`}>
         <span className="font-medium text-slate-800 dark:text-slate-200">
-          On each lesson
+          Each lesson
         </span>{" "}
-        you can add a multiple-choice quiz (optional pass threshold, required for
-        completion), one or more assignments as{" "}
-        <strong className="font-medium">text</strong> or{" "}
-        <strong className="font-medium">file upload</strong>, and approve or reject
-        submissions. Open a lesson below to edit content and assessments.
+        can include a multiple-choice quiz (optional pass threshold and required
+        for completion), assignments with{" "}
+        <strong className="font-medium text-slate-700 dark:text-slate-300">
+          text
+        </strong>{" "}
+        or{" "}
+        <strong className="font-medium text-slate-700 dark:text-slate-300">
+          file upload
+        </strong>
+        , and your review of submissions. Open a lesson below to edit content
+        and assessments.
       </p>
 
-      <section className="mt-10 rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900/50">
-        <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
+      <section className={`mt-10 ${instructorCardClass}`}>
+        <h2 className="text-lg font-semibold tracking-tight text-slate-900 dark:text-white">
           Course details
         </h2>
-        <form action={saveCourse} className="mt-6 space-y-4">
+        <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
+          Catalog listing, cover image, and visibility.
+        </p>
+        <form action={saveCourse} className="mt-8 space-y-5">
           <div>
-            <label
-              htmlFor="title"
-              className="block text-sm font-medium text-slate-700 dark:text-slate-300"
-            >
+            <label htmlFor="title" className={instructorLabelClass}>
               Title
             </label>
             <input
@@ -323,14 +364,11 @@ export default async function EditCoursePage({ params, searchParams }: Props) {
               name="title"
               required
               defaultValue={course.title}
-              className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 dark:border-slate-600 dark:bg-slate-900 dark:text-white"
+              className={instructorInputClass}
             />
           </div>
           <div>
-            <label
-              htmlFor="description"
-              className="block text-sm font-medium text-slate-700 dark:text-slate-300"
-            >
+            <label htmlFor="description" className={instructorLabelClass}>
               Description
             </label>
             <textarea
@@ -339,14 +377,11 @@ export default async function EditCoursePage({ params, searchParams }: Props) {
               required
               rows={5}
               defaultValue={course.description}
-              className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 dark:border-slate-600 dark:bg-slate-900 dark:text-white"
+              className={instructorTextareaClass}
             />
           </div>
           <div>
-            <label
-              htmlFor="thumbnailFile"
-              className="block text-sm font-medium text-slate-700 dark:text-slate-300"
-            >
+            <label htmlFor="thumbnailFile" className={instructorLabelClass}>
               Featured image from computer
             </label>
             <input
@@ -354,17 +389,14 @@ export default async function EditCoursePage({ params, searchParams }: Props) {
               name="thumbnailFile"
               type="file"
               accept="image/png,image/jpeg,image/webp,image/gif"
-              className="mt-1 block w-full text-sm text-slate-600 file:mr-3 file:rounded-lg file:border-0 file:bg-indigo-50 file:px-3 file:py-2 file:text-sm file:font-medium file:text-indigo-700 hover:file:bg-indigo-100 dark:text-slate-400 dark:file:bg-indigo-950/50 dark:file:text-indigo-200"
+              className={instructorFileInputClass}
             />
-            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+            <p className={instructorHintClass}>
               PNG, JPG, WebP, or GIF — max 10 MB. Replaces the current cover.
             </p>
           </div>
           <div>
-            <label
-              htmlFor="thumbnail"
-              className="block text-sm font-medium text-slate-700 dark:text-slate-300"
-            >
+            <label htmlFor="thumbnail" className={instructorLabelClass}>
               Or featured image URL
             </label>
             <input
@@ -377,47 +409,46 @@ export default async function EditCoursePage({ params, searchParams }: Props) {
                   ? ""
                   : (course.thumbnail ?? "")
               }
-              className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 font-mono text-sm text-slate-900 dark:border-slate-600 dark:bg-slate-900 dark:text-white"
+              className={`${instructorInputClass} font-mono text-[13px]`}
             />
-            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-              External image link. Leave blank to keep the current image when
+            <p className={instructorHintClass}>
+              External HTTPS image. Leave blank to keep the current image when
               editing other fields.
             </p>
           </div>
           {course.thumbnail ? (
-            <label className="flex cursor-pointer items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+            <label className="flex cursor-pointer items-center gap-2.5 text-sm text-slate-600 dark:text-slate-400">
               <input
                 type="checkbox"
                 name="removeThumbnail"
-                className="rounded border-slate-300"
+                className="size-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
               />
               Remove featured image
             </label>
           ) : null}
-          <label className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
+          <label className="flex items-center gap-2.5 text-sm font-medium text-slate-700 dark:text-slate-300">
             <input
               type="checkbox"
               name="published"
               defaultChecked={course.published}
-              className="rounded border-slate-300"
+              className="size-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
             />
             Published (visible in catalog)
           </label>
-          <button
-            type="submit"
-            className="rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-indigo-500"
-          >
-            Save changes
-          </button>
+          <div className="border-t border-slate-200 pt-6 dark:border-slate-700">
+            <button type="submit" className={instructorPrimaryButtonClass}>
+              Save changes
+            </button>
+          </div>
         </form>
 
         <div className="mt-10 border-t border-slate-200 pt-8 dark:border-slate-700">
-          <h3 className="text-sm font-semibold text-red-900 dark:text-red-200">
+          <h3 className="text-sm font-semibold uppercase tracking-wide text-red-800 dark:text-red-300/90">
             Danger zone
           </h3>
-          <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
-            Permanently remove this course, all of its content, learner
-            enrollments, and every submission. This action cannot be undone.
+          <p className="mt-2 max-w-xl text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+            Permanently remove this course, all modules and lessons, enrollments,
+            quizzes, assignments, and learner submissions. This cannot be undone.
           </p>
           <DeleteCourseForm
             deleteAction={deleteCourse.bind(null, id)}
@@ -426,41 +457,57 @@ export default async function EditCoursePage({ params, searchParams }: Props) {
         </div>
       </section>
 
-      <section className="mt-10">
-        <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
-          Modules & lessons
-        </h2>
+      <section className="mt-12">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <h2 className="text-lg font-semibold tracking-tight text-slate-900 dark:text-white">
+              Curriculum
+            </h2>
+            <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
+              Modules group lessons. Add a lesson, then open it to write content
+              and set up assessments.
+            </p>
+          </div>
+        </div>
 
-        <form action={addModule} className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-end">
-          <div className="flex-1">
-            <label htmlFor="modTitle" className="sr-only">
-              New module title
+        <form
+          action={addModule}
+          className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-end"
+        >
+          <div className="min-w-0 flex-1">
+            <label htmlFor="modTitle" className={instructorLabelClass}>
+              New module
             </label>
             <input
               id="modTitle"
               name="title"
-              placeholder="New module title"
-              className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 dark:border-slate-600 dark:bg-slate-900 dark:text-white"
+              placeholder="e.g. Week 1 — Foundations"
+              className={instructorInputClass}
             />
           </div>
           <button
             type="submit"
-            className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800 dark:bg-indigo-600 dark:hover:bg-indigo-500"
+            className={`${instructorPrimaryButtonClass} bg-slate-900 hover:bg-slate-800 dark:bg-indigo-600 dark:hover:bg-indigo-500`}
           >
             Add module
           </button>
         </form>
 
-        <ol className="mt-8 space-y-8">
+        <ol className="mt-8 space-y-6">
           {course.modules.map((mod, mi) => (
             <li
               key={mod.id}
-              className="rounded-xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900/50"
+              className="rounded-2xl border border-slate-200/90 bg-white p-5 shadow-sm ring-1 ring-slate-900/[0.03] dark:border-slate-800 dark:bg-slate-900/45 dark:ring-white/[0.04] sm:p-6"
             >
-              <p className="font-semibold text-slate-900 dark:text-white">
-                Module {mi + 1}: {mod.title}
-              </p>
-              <ul className="mt-3 space-y-3">
+              <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                <span className="inline-flex h-7 min-w-[1.75rem] items-center justify-center rounded-lg bg-slate-100 px-2 text-xs font-bold text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                  {mi + 1}
+                </span>
+                <p className="text-base font-semibold text-slate-900 dark:text-white">
+                  {mod.title}
+                </p>
+              </div>
+              <ul className="mt-4 space-y-2">
                 {mod.lessons.map((lesson) => {
                   const pend = lesson.assignments.reduce(
                     (sum, a) =>
@@ -470,17 +517,17 @@ export default async function EditCoursePage({ params, searchParams }: Props) {
                   return (
                     <li
                       key={lesson.id}
-                      className="rounded-lg border border-slate-100 bg-slate-50/80 px-3 py-2.5 dark:border-slate-800 dark:bg-slate-900/30"
+                      className="rounded-xl border border-slate-100 bg-slate-50/90 px-3.5 py-3 dark:border-slate-800 dark:bg-slate-950/40"
                     >
                       <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                         <div className="min-w-0">
                           <Link
                             href={`/instructor/courses/${id}/lessons/${lesson.id}`}
-                            className="text-sm font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400"
+                            className="text-sm font-semibold text-indigo-600 hover:text-indigo-500 dark:text-indigo-400"
                           >
                             {lesson.title}
                           </Link>
-                          <div className="mt-1.5 flex flex-wrap gap-1.5">
+                          <div className="mt-2 flex flex-wrap gap-1.5">
                             {lesson.quiz ? (
                               <span className="inline-flex items-center rounded-md bg-violet-100 px-2 py-0.5 text-xs font-medium text-violet-900 dark:bg-violet-950/60 dark:text-violet-200">
                                 Quiz · {lesson.quiz._count.questions} Q
@@ -517,9 +564,9 @@ export default async function EditCoursePage({ params, searchParams }: Props) {
                         </div>
                         <Link
                           href={`/instructor/courses/${id}/lessons/${lesson.id}`}
-                          className="shrink-0 text-xs font-medium text-slate-600 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400"
+                          className="shrink-0 text-xs font-semibold text-slate-600 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400"
                         >
-                          Edit lesson →
+                          Open editor →
                         </Link>
                       </div>
                     </li>
@@ -528,22 +575,25 @@ export default async function EditCoursePage({ params, searchParams }: Props) {
               </ul>
               <form
                 action={addLesson.bind(null, mod.id)}
-                className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-end"
+                className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-end"
               >
-                <div className="flex-1">
-                  <label htmlFor={`lesson-${mod.id}`} className="sr-only">
-                    Lesson title
+                <div className="min-w-0 flex-1">
+                  <label
+                    htmlFor={`lesson-${mod.id}`}
+                    className={instructorLabelClass}
+                  >
+                    Add lesson to this module
                   </label>
                   <input
                     id={`lesson-${mod.id}`}
                     name="title"
-                    placeholder="New lesson title"
-                    className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 dark:border-slate-600 dark:bg-slate-900 dark:text-white"
+                    placeholder="Lesson title"
+                    className={instructorInputClass}
                   />
                 </div>
                 <button
                   type="submit"
-                  className="rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-800 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-100 dark:hover:bg-slate-800"
+                  className={instructorSecondaryButtonClass}
                 >
                   Add lesson
                 </button>
@@ -552,6 +602,6 @@ export default async function EditCoursePage({ params, searchParams }: Props) {
           ))}
         </ol>
       </section>
-    </main>
+    </InstructorPageShell>
   );
 }

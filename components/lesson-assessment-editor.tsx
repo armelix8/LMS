@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import {
   addQuizQuestion,
   createAssignment,
@@ -71,10 +71,6 @@ export function LessonAssessmentEditor({
   quiz,
   assignments,
 }: Props) {
-  const [tab, setTab] = useState<"quiz" | "assignments">(() =>
-    quiz && quiz.questions.length > 0 ? "quiz" : "assignments",
-  );
-
   const pendingSubs = useMemo(
     () =>
       assignments.reduce(
@@ -86,81 +82,83 @@ export function LessonAssessmentEditor({
   );
 
   return (
-    <div className="mt-12 border-t border-slate-200 pt-10 dark:border-slate-800">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
-            Assessments
-          </h2>
-          <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
-            Switch between quiz and assignments. Open a section below to edit;
-            long lists stay collapsed until you expand them.
-          </p>
-        </div>
-      </div>
+    <div className="mt-14 border-t border-slate-200 pt-12 dark:border-slate-800">
+      <header className="mb-10 max-w-2xl">
+        <h2 className="text-lg font-semibold tracking-tight text-slate-900 dark:text-white">
+          Assessments
+        </h2>
+        <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+          Configure the quiz and assignments for this lesson. Use the page menu
+          to jump between sections. Expand items below to edit; long lists stay
+          collapsed until opened.
+        </p>
+      </header>
 
-      <div
-        className="mt-6 flex flex-wrap gap-2 border-b border-slate-200 pb-px dark:border-slate-700"
-        role="tablist"
-        aria-label="Assessment type"
-      >
-        <button
-          id="tab-quiz"
-          type="button"
-          role="tab"
-          aria-selected={tab === "quiz"}
-          className={`rounded-t-lg px-4 py-2.5 text-sm font-semibold transition ${
-            tab === "quiz"
-              ? "border border-b-0 border-slate-200 bg-white text-indigo-700 dark:border-slate-600 dark:bg-slate-900 dark:text-indigo-300"
-              : "border border-transparent text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800/80"
-          }`}
-          onClick={() => setTab("quiz")}
+      <div className="space-y-14">
+        <section
+          id="edit-lesson-quiz"
+          className="scroll-mt-28 lg:scroll-mt-32"
+          aria-labelledby="heading-lesson-quiz"
         >
-          Quiz
-          {quiz ? (
-            <span className="ml-1.5 tabular-nums text-slate-500 dark:text-slate-400">
-              ({quiz.questions.length} question
-              {quiz.questions.length === 1 ? "" : "s"})
-            </span>
-          ) : (
-            <span className="ml-1.5 text-slate-400">(none)</span>
-          )}
-        </button>
-        <button
-          id="tab-assignments"
-          type="button"
-          role="tab"
-          aria-selected={tab === "assignments"}
-          className={`rounded-t-lg px-4 py-2.5 text-sm font-semibold transition ${
-            tab === "assignments"
-              ? "border border-b-0 border-slate-200 bg-white text-indigo-700 dark:border-slate-600 dark:bg-slate-900 dark:text-indigo-300"
-              : "border border-transparent text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800/80"
-          }`}
-          onClick={() => setTab("assignments")}
-        >
-          Assignments
-          <span className="ml-1.5 tabular-nums text-slate-500 dark:text-slate-400">
-            ({assignments.length})
-          </span>
-          {pendingSubs > 0 ? (
-            <span className="ml-1.5 rounded-full bg-amber-500 px-2 py-0.5 text-[11px] font-bold uppercase text-white dark:bg-amber-600">
-              {pendingSubs} pending
-            </span>
-          ) : null}
-        </button>
-      </div>
+          <div className="mb-5 flex flex-wrap items-end justify-between gap-3 border-b border-slate-200 pb-4 dark:border-slate-700">
+            <div>
+              <h3
+                id="heading-lesson-quiz"
+                className="text-base font-semibold text-slate-900 dark:text-white"
+              >
+                Quiz
+              </h3>
+              <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                Multiple choice · optional pass threshold
+              </p>
+            </div>
+            {quiz ? (
+              <span className="tabular-nums text-sm font-medium text-slate-600 dark:text-slate-300">
+                {quiz.questions.length} question
+                {quiz.questions.length === 1 ? "" : "s"}
+              </span>
+            ) : (
+              <span className="text-sm text-slate-400">No quiz yet</span>
+            )}
+          </div>
+          <div className="rounded-2xl border border-slate-200/90 bg-white p-4 shadow-sm ring-1 ring-slate-900/[0.04] sm:p-6 dark:border-slate-700 dark:bg-slate-900/35 dark:ring-white/[0.05]">
+            <QuizPanel lessonId={lessonId} quiz={quiz} />
+          </div>
+        </section>
 
-      <div
-        className="rounded-b-xl rounded-tr-xl border border-t-0 border-slate-200 bg-white p-4 sm:p-6 dark:border-slate-700 dark:bg-slate-900/40"
-        role="tabpanel"
-        id="instructor-assessment-panel"
-        aria-labelledby={tab === "quiz" ? "tab-quiz" : "tab-assignments"}
-      >
-        {tab === "quiz" ? (
-          <QuizPanel lessonId={lessonId} quiz={quiz} />
-        ) : (
-          <AssignmentsPanel lessonId={lessonId} assignments={assignments} />
-        )}
+        <section
+          id="edit-lesson-assignments"
+          className="scroll-mt-28 lg:scroll-mt-32"
+          aria-labelledby="heading-lesson-assignments"
+        >
+          <div className="mb-5 flex flex-wrap items-end justify-between gap-3 border-b border-slate-200 pb-4 dark:border-slate-700">
+            <div>
+              <h3
+                id="heading-lesson-assignments"
+                className="text-base font-semibold text-slate-900 dark:text-white"
+              >
+                Assignments
+              </h3>
+              <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                File or text responses · review submissions here
+              </p>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="tabular-nums text-sm font-medium text-slate-600 dark:text-slate-300">
+                {assignments.length} assignment
+                {assignments.length === 1 ? "" : "s"}
+              </span>
+              {pendingSubs > 0 ? (
+                <span className="rounded-full bg-amber-500 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-white dark:bg-amber-600">
+                  {pendingSubs} review pending
+                </span>
+              ) : null}
+            </div>
+          </div>
+          <div className="rounded-2xl border border-slate-200/90 bg-white p-4 shadow-sm ring-1 ring-slate-900/[0.04] sm:p-6 dark:border-slate-700 dark:bg-slate-900/35 dark:ring-white/[0.05]">
+            <AssignmentsPanel lessonId={lessonId} assignments={assignments} />
+          </div>
+        </section>
       </div>
     </div>
   );

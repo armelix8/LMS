@@ -1,4 +1,16 @@
 import { createCourse } from "@/app/actions/lms";
+import {
+  InstructorBreadcrumbs,
+  InstructorPageShell,
+  InstructorPageTitle,
+  instructorCardClass,
+  instructorFileInputClass,
+  instructorHintClass,
+  instructorInputClass,
+  instructorLabelClass,
+  instructorPrimaryButtonClass,
+  instructorTextareaClass,
+} from "@/components/instructor-page-chrome";
 
 export const metadata = { title: "New course" };
 
@@ -24,93 +36,122 @@ export default async function NewCoursePage({ searchParams }: Props) {
         : null;
 
   return (
-    <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-10 sm:px-6">
-      <h1 className="text-3xl font-bold text-slate-900 dark:text-white">
-        New course
-      </h1>
-      <p className="mt-2 text-slate-600 dark:text-slate-400">
-        You can add modules and lessons after saving the basics.
-      </p>
+    <InstructorPageShell maxWidthClass="max-w-2xl">
+      <InstructorBreadcrumbs
+        items={[
+          { href: "/instructor/courses", label: "Courses" },
+          { label: "New course" },
+        ]}
+      />
+
+      <div className="mt-6">
+        <InstructorPageTitle
+          eyebrow="Create"
+          title="New course"
+          description="Name your course and add a short description. You will add modules, lessons, quizzes, and assignments after this step."
+        />
+      </div>
 
       {errorMessage && (
-        <p className="mt-4 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-900 dark:bg-amber-950/40 dark:text-amber-200">
+        <p
+          className="mt-6 rounded-xl border border-amber-200/90 bg-amber-50 px-4 py-3 text-sm text-amber-950 dark:border-amber-900/50 dark:bg-amber-950/35 dark:text-amber-100"
+          role="alert"
+        >
           {errorMessage}
         </p>
       )}
 
       <form action={createCourse} className="mt-8 space-y-6">
-        <div>
-          <label
-            htmlFor="title"
-            className="block text-sm font-medium text-slate-700 dark:text-slate-300"
-          >
-            Title
-          </label>
-          <input
-            id="title"
-            name="title"
-            required
-            className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 dark:border-slate-600 dark:bg-slate-900 dark:text-white"
-          />
-        </div>
-        <div>
-          <label
-            htmlFor="description"
-            className="block text-sm font-medium text-slate-700 dark:text-slate-300"
-          >
-            Description
-          </label>
-          <textarea
-            id="description"
-            name="description"
-            required
-            rows={6}
-            className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 dark:border-slate-600 dark:bg-slate-900 dark:text-white"
-          />
-        </div>
-        <div>
-          <label
-            htmlFor="thumbnailFile"
-            className="block text-sm font-medium text-slate-700 dark:text-slate-300"
-          >
-            Featured image from computer
-          </label>
-          <input
-            id="thumbnailFile"
-            name="thumbnailFile"
-            type="file"
-            accept="image/png,image/jpeg,image/webp,image/gif"
-            className="mt-1 block w-full text-sm text-slate-600 file:mr-3 file:rounded-lg file:border-0 file:bg-indigo-50 file:px-3 file:py-2 file:text-sm file:font-medium file:text-indigo-700 hover:file:bg-indigo-100 dark:text-slate-400 dark:file:bg-indigo-950/50 dark:file:text-indigo-200"
-          />
-          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-            PNG, JPG, WebP, or GIF — max 10 MB. Upload overrides the URL below.
+        <div className={instructorCardClass}>
+          <h2 className="text-base font-semibold text-slate-900 dark:text-white">
+            Basics
+          </h2>
+          <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
+            This information appears in the course catalog when the course is
+            published.
           </p>
+          <div className="mt-6 space-y-5">
+            <div>
+              <label htmlFor="title" className={instructorLabelClass}>
+                Course title
+              </label>
+              <input
+                id="title"
+                name="title"
+                required
+                autoComplete="off"
+                placeholder="e.g. Introduction to additive manufacturing"
+                className={instructorInputClass}
+              />
+            </div>
+            <div>
+              <label htmlFor="description" className={instructorLabelClass}>
+                Description
+              </label>
+              <textarea
+                id="description"
+                name="description"
+                required
+                rows={6}
+                placeholder="Summarize outcomes, audience, and what learners will build or submit."
+                className={instructorTextareaClass}
+              />
+            </div>
+          </div>
         </div>
-        <div>
-          <label
-            htmlFor="thumbnail"
-            className="block text-sm font-medium text-slate-700 dark:text-slate-300"
-          >
-            Or featured image URL
-          </label>
-          <input
-            id="thumbnail"
-            name="thumbnail"
-            type="url"
-            placeholder="https://…"
-            className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 font-mono text-sm text-slate-900 dark:border-slate-600 dark:bg-slate-900 dark:text-white"
-          />
-          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-            Optional. Leave both blank for no cover image.
+
+        <div className={instructorCardClass}>
+          <h2 className="text-base font-semibold text-slate-900 dark:text-white">
+            Cover image
+          </h2>
+          <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
+            Optional. A strong cover improves discovery in the catalog.
           </p>
+          <div className="mt-6 space-y-5">
+            <div>
+              <label htmlFor="thumbnailFile" className={instructorLabelClass}>
+                Upload from your computer
+              </label>
+              <input
+                id="thumbnailFile"
+                name="thumbnailFile"
+                type="file"
+                accept="image/png,image/jpeg,image/webp,image/gif"
+                className={instructorFileInputClass}
+              />
+              <p className={instructorHintClass}>
+                PNG, JPG, WebP, or GIF — max 10 MB. Uploading replaces any URL
+                below.
+              </p>
+            </div>
+            <div>
+              <label htmlFor="thumbnail" className={instructorLabelClass}>
+                Or image URL
+              </label>
+              <input
+                id="thumbnail"
+                name="thumbnail"
+                type="url"
+                placeholder="https://example.com/course-cover.jpg"
+                className={`${instructorInputClass} font-mono text-[13px]`}
+              />
+              <p className={instructorHintClass}>
+                HTTPS link only. Leave both empty if you do not want a cover
+                yet.
+              </p>
+            </div>
+          </div>
         </div>
-        <button
-          type="submit"
-          className="rounded-xl bg-indigo-600 px-6 py-3 text-sm font-semibold text-white hover:bg-indigo-500"
-        >
-          Create and continue
-        </button>
+
+        <div className="flex flex-col gap-4 border-t border-slate-200 pt-8 dark:border-slate-800 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-sm text-slate-500 dark:text-slate-400">
+            You can edit all of this later from course settings.
+          </p>
+          <button type="submit" className={instructorPrimaryButtonClass}>
+            Create course
+          </button>
+        </div>
       </form>
-    </main>
+    </InstructorPageShell>
   );
 }

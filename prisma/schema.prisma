@@ -293,13 +293,15 @@ model LessonProgress {
 
 /// Institutional program: many cohorts share the same phase template (course links + program-level assignments).
 model Program {
-  id          String   @id @default(cuid())
-  title       String
-  slug        String   @unique
-  description String   @db.Text
-  published   Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id            String   @id @default(cuid())
+  title         String
+  slug          String   @unique
+  description   String   @db.Text
+  /// Optional hero image on the public program page (site-relative URL, e.g. /images/programs/…).
+  coverImageUrl String?
+  published     Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   cohorts ProgramCohort[]
   phases  ProgramPhase[]

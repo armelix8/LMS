@@ -2,10 +2,15 @@ import type { Prisma } from "@prisma/client";
 import Link from "next/link";
 import { auth } from "@/auth";
 import { CourseFeaturedImage } from "@/components/course-featured-image";
+import {
+  InstructorPageShell,
+  InstructorPageTitle,
+  instructorPrimaryButtonClass,
+} from "@/components/instructor-page-chrome";
 import { isDatabaseUnavailableError } from "@/lib/database-error";
 import { prisma } from "@/lib/prisma";
 
-export const metadata = { title: "My courses" };
+export const metadata = { title: "Courses" };
 
 const courseListInclude = {
   _count: {
@@ -82,8 +87,14 @@ export default async function InstructorCoursesPage() {
     }
   }
 
+  const pageEyebrow = isAdmin ? "Admin" : "Instructor";
+  const pageTitle = isAdmin ? "Manage all courses" : "Manage your courses";
+  const pageDescription = isAdmin
+    ? "View and edit every course in the system. Create new courses, add lessons and assessments, and review learner work."
+    : "Create and publish your courses. Add quizzes and assignments on each lesson, then review learner work from the course or lesson editor.";
+
   return (
-    <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-10 sm:px-6">
+    <InstructorPageShell maxWidthClass="max-w-6xl">
       {databaseUnavailable && (
         <div
           className="mb-8 rounded-xl border border-amber-200 bg-amber-50 px-4 py-4 text-sm text-amber-950 dark:border-amber-900/50 dark:bg-amber-950/40 dark:text-amber-100"
@@ -103,32 +114,25 @@ export default async function InstructorCoursesPage() {
           </p>
         </div>
       )}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-slate-900 dark:text-white">
-            Courses
-          </h1>
-          <p className="mt-1 text-slate-600 dark:text-slate-400">
-            Draft and publish courses. Configure quizzes and assignments (text or
-            file) on each lesson, then review submissions.
-          </p>
-        </div>
-        <Link
-          href="/instructor/courses/new"
-          className="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-indigo-500"
-        >
-          New course
-        </Link>
-      </div>
+      <InstructorPageTitle
+        eyebrow={pageEyebrow}
+        title={pageTitle}
+        description={pageDescription}
+        actions={
+          <Link href="/instructor/courses/new" className={instructorPrimaryButtonClass}>
+            New course
+          </Link>
+        }
+      />
 
-      <ul className="mt-10 divide-y divide-slate-200 rounded-xl border border-slate-200 bg-white dark:divide-slate-800 dark:border-slate-800 dark:bg-slate-900/50">
+      <ul className="mt-10 divide-y divide-slate-200/90 rounded-2xl border border-slate-200/90 bg-white shadow-sm ring-1 ring-slate-900/[0.04] dark:divide-slate-800 dark:border-slate-800 dark:bg-slate-900/50 dark:ring-white/[0.04]">
         {courses.map((c) => {
           const pending = pendingByCourseId.get(c.id) ?? 0;
           const enrollmentRequests = enrollmentRequestsByCourseId.get(c.id) ?? 0;
           return (
             <li
               key={c.id}
-              className="flex flex-col gap-3 px-5 py-4 sm:flex-row sm:items-center sm:justify-between"
+              className="flex flex-col gap-3 px-5 py-5 sm:flex-row sm:items-center sm:justify-between"
             >
               <div className="flex min-w-0 flex-1 gap-4">
                 <CourseFeaturedImage
@@ -216,6 +220,6 @@ export default async function InstructorCoursesPage() {
           </li>
         )}
       </ul>
-    </main>
+    </InstructorPageShell>
   );
 }

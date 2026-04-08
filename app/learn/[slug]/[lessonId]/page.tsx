@@ -8,7 +8,10 @@ import {
   LessonNavigationBar,
 } from "@/components/lesson-navigation";
 import { CourseFeaturedImage } from "@/components/course-featured-image";
+import { LessonBlockNoteViewLoader } from "@/components/lesson-block-note-view-loader";
+import { LessonVideoEmbed } from "@/components/lesson-video-embed";
 import { MarkdownContent } from "@/components/markdown-content";
+import { isBlockNoteContent } from "@/lib/lesson-blocknote";
 import { QuizTaker } from "@/components/quiz-taker";
 import { LearnerCourseProgressBar } from "@/components/learner-course-progress-bar";
 import { LessonMessagesChat } from "@/components/lesson-messages-chat";
@@ -311,21 +314,18 @@ export default async function LessonPage({ params }: Props) {
           {lesson.title}
         </h1>
 
-        {lesson.videoUrl && (
-          <div className="mt-6 aspect-video w-full overflow-hidden rounded-xl bg-slate-900">
-            <iframe
-              title="Lesson video"
-              src={lesson.videoUrl}
-              className="h-full w-full"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-            />
-          </div>
+        {isBlockNoteContent(lesson.content) ? (
+          <LessonBlockNoteViewLoader raw={lesson.content} />
+        ) : (
+          <>
+            {lesson.videoUrl ? (
+              <LessonVideoEmbed videoUrl={lesson.videoUrl} />
+            ) : null}
+            <div className="mt-8">
+              <MarkdownContent content={lesson.content} />
+            </div>
+          </>
         )}
-
-        <div className="mt-8">
-          <MarkdownContent content={lesson.content} />
-        </div>
 
         {quizForLearner && (
           <section className="mt-12 border-t border-slate-200 pt-10 dark:border-slate-800">
