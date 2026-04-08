@@ -18,7 +18,7 @@
 /out/
 
 # learner assignment uploads
-/public/uploads/
+#/public/uploads/
 
 # production
 /build
