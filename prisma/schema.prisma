@@ -1,0 +1,424 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  STUDENT
+  INSTRUCTOR
+  ADMIN
+}
+
+enum AssignmentResponseType {
+  TEXT
+  FILE
+}
+
+enum SubmissionReviewStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum EnrollmentStatus {
+  PENDING
+  ACTIVE
+  REJECTED
+}
+
+enum CohortMemberStatus {
+  APPLIED
+  ACTIVE
+  REJECTED
+  WITHDRAWN
+}
+
+enum NotificationType {
+  ENROLLMENT_REQUEST
+  ENROLLMENT_APPROVED
+  ENROLLMENT_REJECTED
+  COURSE_MESSAGE
+  COHORT_APPLICATION
+  COHORT_APPROVED
+  COHORT_REJECTED
+  COHORT_ASSIGNED
+  PROGRAM_ASSIGNMENT_SUBMITTED
+  PROGRAM_ASSIGNMENT_REVIEWED
+  ASSIGNMENT_SUBMITTED
+  ASSIGNMENT_REVIEWED
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  emailVerified DateTime?
+  name          String?
+  /// Professional title or tagline (e.g. “Mechanical engineer · CAD specialist”).
+  headline      String?
+  bio           String?   @db.Text
+  image         String?
+  password      String?
+  role          Role      @default(STUDENT)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts      Account[]
+  coursesTeaching Course[]      @relation("InstructorCourses")
+  enrollments   Enrollment[]
+  lessonProgress LessonProgress[]
+  quizAttempts  QuizAttempt[]
+  assignmentSubmissions AssignmentSubmission[]
+  courseMessages    CourseMessage[]
+  cohortMembers     CohortMember[]
+  programPhaseAssignmentSubmissions ProgramPhaseAssignmentSubmission[]
+  notifications     Notification[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Course {
+  id           String   @id @default(cuid())
+  title        String
+  slug         String   @unique
+  description  String   @db.Text
+  thumbnail    String?
+  published    Boolean  @default(false)
+  instructorId String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  instructor   User           @relation("InstructorCourses", fields: [instructorId], references: [id], onDelete: Cascade)
+  modules      Module[]
+  enrollments           Enrollment[]
+  programPhaseCourses   ProgramPhaseCourse[]
+}
+
+model Module {
+  id        String   @id @default(cuid())
+  courseId  String
+  title     String
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  course  Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  lessons Lesson[]
+}
+
+model Lesson {
+  id          String   @id @default(cuid())
+  moduleId    String
+  title       String
+  content     String   @db.Text
+  videoUrl    String?
+  durationMin Int?
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  module      Module           @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  progress    LessonProgress[]
+  quiz        Quiz?
+  assignments Assignment[]
+}
+
+/// Multiple-choice quiz attached to a single lesson (one per lesson).
+model Quiz {
+  id                      String   @id @default(cuid())
+  lessonId                String   @unique
+  title                   String
+  passPercent             Int      @default(70)
+  requiredForCompletion   Boolean  @default(false)
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+
+  lesson    Lesson         @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  questions QuizQuestion[]
+  attempts  QuizAttempt[]
+}
+
+model QuizQuestion {
+  id          String   @id @default(cuid())
+  quizId      String
+  prompt      String   @db.Text
+  sortOrder   Int      @default(0)
+  quiz        Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  options     QuizOption[]
+  attemptAnswers QuizAttemptAnswer[]
+}
+
+model QuizOption {
+  id         String   @id @default(cuid())
+  questionId String
+  text       String
+  isCorrect  Boolean  @default(false)
+  sortOrder  Int      @default(0)
+  question   QuizQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  attemptAnswers QuizAttemptAnswer[]
+}
+
+model QuizAttempt {
+  id        String   @id @default(cuid())
+  quizId    String
+  userId    String
+  score     Int
+  passed    Boolean
+  createdAt DateTime @default(now())
+
+  quiz    Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  answers QuizAttemptAnswer[]
+
+  @@index([quizId, userId])
+}
+
+model QuizAttemptAnswer {
+  id         String @id @default(cuid())
+  attemptId  String
+  questionId String
+  optionId   String
+
+  attempt  QuizAttempt  @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  question QuizQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  option   QuizOption   @relation(fields: [optionId], references: [id], onDelete: Cascade)
+
+  @@unique([attemptId, questionId])
+}
+
+/// Assignment: text response or file upload. A lesson may have many.
+model Assignment {
+  id                    String                 @id @default(cuid())
+  lessonId              String
+  sortOrder             Int                    @default(0)
+  title                 String
+  description           String                 @db.Text
+  maxPoints             Int                    @default(100)
+  dueAt                 DateTime?
+  requiredForCompletion Boolean                @default(false)
+  responseType          AssignmentResponseType @default(TEXT)
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+
+  lesson       Lesson                  @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  submissions  AssignmentSubmission[]
+
+  @@index([lessonId, sortOrder])
+}
+
+model AssignmentSubmission {
+  id            String                 @id @default(cuid())
+  assignmentId  String
+  userId        String
+  content       String                 @default("") @db.Text
+  fileUrl       String?
+  fileName      String?
+  submittedAt   DateTime               @default(now())
+  grade         Int?
+  feedback      String?                @db.Text
+  gradedAt      DateTime?
+  reviewStatus  SubmissionReviewStatus @default(PENDING)
+
+  assignment Assignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([assignmentId, userId])
+}
+
+model Enrollment {
+  id         String   @id @default(cuid())
+  userId   String
+  courseId String
+  enrolledAt DateTime @default(now())
+  /// Instructor must approve before the learner can access lessons.
+  status   EnrollmentStatus @default(PENDING)
+  /// When the learner last opened the course messages page (clears unread for them).
+  studentMessagesReadAt DateTime?
+  /// When the instructor last opened this thread in Students (clears unread from learner for them).
+  instructorMessagesReadAt DateTime?
+
+  user     User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course   Course          @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  messages CourseMessage[]
+
+  @@unique([userId, courseId])
+  @@index([courseId, status])
+}
+
+/// Student ↔ instructor thread for one enrollment (one course, one learner).
+model CourseMessage {
+  id           String   @id @default(cuid())
+  enrollmentId String
+  senderId     String
+  body         String   @db.Text
+  createdAt    DateTime @default(now())
+
+  enrollment Enrollment @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
+  sender     User       @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([enrollmentId, createdAt])
+}
+
+model LessonProgress {
+  id          String   @id @default(cuid())
+  userId      String
+  lessonId    String
+  completedAt DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, lessonId])
+}
+
+/// Institutional program: many cohorts share the same phase template (course links + program-level assignments).
+model Program {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  description String   @db.Text
+  published   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  cohorts ProgramCohort[]
+  phases  ProgramPhase[]
+}
+
+model ProgramCohort {
+  id                  String    @id @default(cuid())
+  programId           String
+  name                String
+  slug                String
+  /// When true and within optional date window, learners may self-apply.
+  applicationsOpen    Boolean   @default(false)
+  applicationOpensAt  DateTime?
+  applicationClosesAt DateTime?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  program Program        @relation(fields: [programId], references: [id], onDelete: Cascade)
+  members CohortMember[]
+
+  @@unique([programId, slug])
+  @@index([programId])
+}
+
+model CohortMember {
+  id        String             @id @default(cuid())
+  cohortId  String
+  userId    String
+  status    CohortMemberStatus @default(APPLIED)
+  appliedAt DateTime           @default(now())
+  decidedAt DateTime?
+
+  cohort ProgramCohort @relation(fields: [cohortId], references: [id], onDelete: Cascade)
+  user   User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([cohortId, userId])
+  @@index([userId])
+}
+
+/// Ordered steps under a program. Optional linked courses (complete all lessons in each) and/or program-only assignments.
+model ProgramPhase {
+  id          String   @id @default(cuid())
+  programId   String
+  sortOrder   Int      @default(0)
+  title       String
+  description String?  @db.Text
+
+  program       Program              @relation(fields: [programId], references: [id], onDelete: Cascade)
+  phaseCourses  ProgramPhaseCourse[]
+  assignments   ProgramPhaseAssignment[]
+
+  @@index([programId, sortOrder])
+}
+
+/// Many courses may be required for a single phase (all must be fully completed).
+model ProgramPhaseCourse {
+  id        String @id @default(cuid())
+  phaseId   String
+  courseId  String
+  sortOrder Int    @default(0)
+
+  phase  ProgramPhase @relation(fields: [phaseId], references: [id], onDelete: Cascade)
+  course Course       @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([phaseId, courseId])
+  @@index([phaseId, sortOrder])
+}
+
+/// Assignment tied to a program phase (not inside a lesson — course structure unchanged).
+model ProgramPhaseAssignment {
+  id                    String                 @id @default(cuid())
+  phaseId               String
+  sortOrder             Int                    @default(0)
+  title                 String
+  description           String                 @db.Text
+  maxPoints             Int                    @default(100)
+  dueAt                 DateTime?
+  requiredForCompletion Boolean                @default(true)
+  responseType          AssignmentResponseType @default(TEXT)
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+
+  phase       ProgramPhase                       @relation(fields: [phaseId], references: [id], onDelete: Cascade)
+  submissions ProgramPhaseAssignmentSubmission[]
+
+  @@index([phaseId, sortOrder])
+}
+
+model ProgramPhaseAssignmentSubmission {
+  id           String                 @id @default(cuid())
+  assignmentId String
+  userId       String
+  content      String                 @default("") @db.Text
+  fileUrl      String?
+  fileName     String?
+  submittedAt  DateTime               @default(now())
+  grade        Int?
+  feedback     String?                @db.Text
+  gradedAt     DateTime?
+  reviewStatus SubmissionReviewStatus @default(PENDING)
+
+  assignment ProgramPhaseAssignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  user       User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([assignmentId, userId])
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  type      NotificationType
+  title     String
+  body      String?          @db.Text
+  linkUrl   String?
+  readAt    DateTime?
+  createdAt DateTime         @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, readAt])
+  @@index([userId, createdAt])
+}

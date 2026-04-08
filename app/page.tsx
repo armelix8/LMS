@@ -1,65 +1,241 @@
 import Image from "next/image";
+import Link from "next/link";
+import { auth } from "@/auth";
 
-export default function Home() {
+function IconRoles({ className }: { className?: string }) {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      aria-hidden
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"
+      />
+    </svg>
+  );
+}
+
+function IconStructure({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      aria-hidden
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z"
+      />
+    </svg>
+  );
+}
+
+function IconProgress({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      aria-hidden
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z"
+      />
+    </svg>
+  );
+}
+
+const trustItems = [
+  "Role-based access",
+  "Secure sessions",
+  "Progress visibility",
+];
+
+export default async function HomePage() {
+  const session = await auth();
+
+  return (
+    <main className="flex-1">
+      {/* Hero */}
+      <section className="relative overflow-hidden border-b border-teal-900/[0.08] dark:border-teal-400/10">
+        <div
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(14,165,233,0.18),transparent)] dark:bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(56,189,248,0.12),transparent)]"
+          aria-hidden
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+        <div
+          className="pointer-events-none absolute -right-32 top-1/2 h-[28rem] w-[28rem] -translate-y-1/2 rounded-full bg-teal-400/10 blur-3xl dark:bg-teal-500/5"
+          aria-hidden
+        />
+        <div
+          className="pointer-events-none absolute right-1/4 top-0 h-48 w-48 rounded-full bg-[var(--brand-accent)]/15 blur-3xl dark:bg-[var(--brand-accent)]/8"
+          aria-hidden
+        />
+
+        <div className="relative mx-auto grid max-w-6xl gap-12 px-4 py-16 sm:px-6 sm:py-20 lg:grid-cols-[1fr_minmax(0,20rem)] lg:items-center lg:gap-16 lg:py-24">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-teal-800/90 dark:text-teal-300/90">
+              UniPod Learn
+            </p>
+            <h1 className="mt-4 max-w-2xl text-balance text-4xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-5xl lg:text-[2.75rem] lg:leading-[1.12]">
+              A clear path from enrollment to measurable outcomes
+            </h1>
+            <p className="mt-5 max-w-xl text-pretty text-base leading-relaxed text-slate-600 dark:text-slate-400 sm:text-lg">
+              Deliver structured programs with modules, lessons, and
+              assessments—so learners stay on track and teams can see progress
+              at a glance.
+            </p>
+
+            <ul className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm text-slate-500 dark:text-slate-500">
+              {trustItems.map((label) => (
+                <li key={label} className="flex items-center gap-2">
+                  <span
+                    className="inline-flex h-1.5 w-1.5 shrink-0 rounded-full bg-sky-500 dark:bg-sky-400"
+                    aria-hidden
+                  />
+                  {label}
+                </li>
+              ))}
+            </ul>
+
+            <div className="mt-10 flex flex-wrap items-center gap-3">
+              <Link
+                href="/courses"
+                className="inline-flex min-h-11 items-center justify-center rounded-lg bg-sky-600 px-6 text-sm font-semibold text-white shadow-md shadow-sky-900/10 transition hover:bg-sky-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--brand-accent)] dark:bg-sky-500 dark:hover:bg-sky-400"
+              >
+                Browse courses
+              </Link>
+              {session ? (
+                <Link
+                  href="/dashboard"
+                  className="inline-flex min-h-11 items-center justify-center rounded-lg border border-slate-300/90 bg-white/80 px-6 text-sm font-semibold text-slate-800 backdrop-blur-sm transition hover:border-teal-700/20 hover:bg-white dark:border-slate-600 dark:bg-slate-800/80 dark:text-slate-100 dark:hover:border-teal-500/30 dark:hover:bg-slate-800"
+                >
+                  Dashboard
+                </Link>
+              ) : (
+                <Link
+                  href="/auth/signup"
+                  className="inline-flex min-h-11 items-center justify-center rounded-lg border border-slate-300/90 bg-white/80 px-6 text-sm font-semibold text-slate-800 backdrop-blur-sm transition hover:border-teal-700/20 hover:bg-white dark:border-slate-600 dark:bg-slate-800/80 dark:text-slate-100 dark:hover:border-teal-500/30 dark:hover:bg-slate-800"
+                >
+                  Create account
+                </Link>
+              )}
+            </div>
+          </div>
+
+          <div className="relative mx-auto w-full max-w-sm lg:mx-0 lg:max-w-none">
+            <div className="rounded-2xl border border-teal-900/10 bg-white/70 p-6 shadow-[0_1px_0_rgba(15,118,110,0.06),0_24px_48px_-12px_rgba(15,23,42,0.12)] backdrop-blur-sm dark:border-teal-500/15 dark:bg-slate-900/60 dark:shadow-[0_24px_48px_-12px_rgba(0,0,0,0.45)]">
+              <div className="relative mx-auto aspect-[5/2] w-full max-w-[280px]">
+                <Image
+                  src="/brand/unipod-logo.png"
+                  alt="UniPod — University of Rwanda"
+                  fill
+                  className="object-contain object-left"
+                  sizes="280px"
+                  priority
+                />
+              </div>
+              <p className="mt-5 border-t border-slate-200/90 pt-5 text-xs leading-relaxed text-slate-500 dark:border-slate-700 dark:text-slate-400">
+                Official learning environment for program delivery, learner
+                progress, and instructor-led content—aligned with institutional
+                standards.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Capabilities */}
+      <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:py-24">
+        <div className="max-w-2xl">
+          <h2 className="text-sm font-semibold uppercase tracking-wider text-sky-700 dark:text-sky-400">
+            Platform capabilities
+          </h2>
+          <p className="mt-2 text-2xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-3xl">
+            Built for programs that need structure and accountability
+          </p>
+          <p className="mt-3 text-base text-slate-600 dark:text-slate-400">
+            One place for content, access control, and visibility—without
+            sacrificing clarity for learners or staff.
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
+          {[
+            {
+              Icon: IconRoles,
+              title: "Role-aware access",
+              body: "Students, instructors, and administrators each see what they need. Permissions are enforced on the server, not only in the UI.",
+            },
+            {
+              Icon: IconStructure,
+              title: "Structured learning paths",
+              body: "Organize material into modules and lessons with rich text and media. Learners move through content in a consistent, guided order.",
+            },
+            {
+              Icon: IconProgress,
+              title: "Progress and assessment",
+              body: "Track completion and use assignments where appropriate so teams can review engagement and outcomes over time.",
+            },
+          ].map(({ Icon, title, body }) => (
+            <article
+              key={title}
+              className="group flex flex-col rounded-2xl border border-slate-200/90 bg-white p-6 shadow-sm transition hover:border-teal-800/15 hover:shadow-md dark:border-slate-800 dark:bg-slate-900/40 dark:hover:border-teal-500/20"
+            >
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-teal-50 text-teal-800 dark:bg-teal-950/80 dark:text-teal-300">
+                <Icon className="h-6 w-6" />
+              </div>
+              <h3 className="mt-5 text-lg font-semibold text-slate-900 dark:text-white">
+                {title}
+              </h3>
+              <p className="mt-2 flex-1 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+                {body}
+              </p>
+            </article>
+          ))}
         </div>
-      </main>
-    </div>
+      </section>
+
+      {/* Closing CTA */}
+      <section className="border-t border-teal-900/8 bg-gradient-to-b from-slate-50/80 to-transparent px-4 py-14 dark:border-teal-500/10 dark:from-slate-900/50 sm:px-6 sm:py-16">
+        <div className="mx-auto max-w-3xl text-center">
+          <h2 className="text-xl font-bold text-slate-900 dark:text-white sm:text-2xl">
+            Ready to open a course?
+          </h2>
+          <p className="mx-auto mt-3 max-w-lg text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+            Explore the catalog or sign in to continue where you left off.
+          </p>
+          <div className="mt-8 flex flex-wrap justify-center gap-3">
+            <Link
+              href="/courses"
+              className="inline-flex min-h-11 items-center justify-center rounded-lg bg-sky-600 px-6 text-sm font-semibold text-white shadow-md transition hover:bg-sky-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--brand-accent)] dark:bg-sky-500 dark:hover:bg-sky-400"
+            >
+              View catalog
+            </Link>
+            {!session && (
+              <Link
+                href="/auth/signin"
+                className="inline-flex min-h-11 items-center justify-center rounded-lg px-5 text-sm font-semibold text-teal-800 underline-offset-4 hover:underline dark:text-teal-300"
+              >
+                Sign in
+              </Link>
+            )}
+          </div>
+        </div>
+      </section>
+    </main>
   );
 }

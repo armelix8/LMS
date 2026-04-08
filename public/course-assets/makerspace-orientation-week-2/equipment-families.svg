@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 320" fill="none" aria-labelledby="title desc" role="img">
+  <title id="title">Equipment families in the makerspace</title>
+  <desc id="desc">Four columns: additive 3D printing, subtractive laser and CNC, electronics, and bench hand tools.</desc>
+  <rect width="640" height="320" fill="#f8fafc"/>
+  <text x="320" y="30" text-anchor="middle" fill="#0f172a" font-family="system-ui,sans-serif" font-size="14" font-weight="700">Equipment families covered in practical demonstrations</text>
+  <g stroke-width="1.5" font-family="system-ui,sans-serif" font-size="10">
+    <rect x="24" y="52" width="136" height="220" rx="10" fill="#fff" stroke="#0ea5e9"/>
+    <text x="92" y="78" text-anchor="middle" fill="#0369a1" font-weight="700" font-size="11">3D printers</text>
+    <text x="92" y="102" text-anchor="middle" fill="#334155">FDM / resin per lab</text>
+    <text x="92" y="124" text-anchor="middle" fill="#334155">Hot surfaces &amp; fumes</text>
+    <text x="92" y="146" text-anchor="middle" fill="#334155">Filament / resin SOP</text>
+    <text x="92" y="168" text-anchor="middle" fill="#334155">First-layer checks</text>
+    <text x="92" y="200" text-anchor="middle" fill="#64748b" font-size="9">Never leave unattended</text>
+    <text x="92" y="216" text-anchor="middle" fill="#64748b" font-size="9">unless SOP allows</text>
+    <rect x="176" y="52" width="136" height="220" rx="10" fill="#fff" stroke="#ea580c"/>
+    <text x="244" y="78" text-anchor="middle" fill="#c2410c" font-weight="700" font-size="11">Laser &amp; CNC</text>
+    <text x="244" y="102" text-anchor="middle" fill="#334155">Fire &amp; fume risk</text>
+    <text x="244" y="124" text-anchor="middle" fill="#334155">Ventilation / enclosure</text>
+    <text x="244" y="146" text-anchor="middle" fill="#334155">Material allow-list</text>
+    <text x="244" y="168" text-anchor="middle" fill="#334155">Rotating spindle safety</text>
+    <text x="244" y="200" text-anchor="middle" fill="#64748b" font-size="9">Interlocks &amp; clamps</text>
+    <text x="244" y="216" text-anchor="middle" fill="#64748b" font-size="9">never bypass</text>
+    <rect x="328" y="52" width="136" height="220" rx="10" fill="#fff" stroke="#7c3aed"/>
+    <text x="396" y="78" text-anchor="middle" fill="#5b21b6" font-weight="700" font-size="11">Electronics lab</text>
+    <text x="396" y="102" text-anchor="middle" fill="#334155">ESD-aware handling</text>
+    <text x="396" y="124" text-anchor="middle" fill="#334155">Power supplies</text>
+    <text x="396" y="146" text-anchor="middle" fill="#334155">Soldering / fume</text>
+    <text x="396" y="168" text-anchor="middle" fill="#334155">Multimeter basics</text>
+    <text x="396" y="200" text-anchor="middle" fill="#64748b" font-size="9">Isolate power before</text>
+    <text x="396" y="216" text-anchor="middle" fill="#64748b" font-size="9">wiring changes</text>
+    <rect x="480" y="52" width="136" height="220" rx="10" fill="#fff" stroke="#0f766e"/>
+    <text x="548" y="78" text-anchor="middle" fill="#115e59" font-weight="700" font-size="11">Hand tools</text>
+    <text x="548" y="102" text-anchor="middle" fill="#334155">Measuring &amp; marking</text>
+    <text x="548" y="124" text-anchor="middle" fill="#334155">Cutting &amp; fastening</text>
+    <text x="548" y="146" text-anchor="middle" fill="#334155">Vises &amp; clamps</text>
+    <text x="548" y="168" text-anchor="middle" fill="#334155">Sharp edge control</text>
+    <text x="548" y="200" text-anchor="middle" fill="#64748b" font-size="9">Return tools clean</text>
+    <text x="548" y="216" text-anchor="middle" fill="#64748b" font-size="9">to assigned storage</text>
+  </g>
+  <text x="320" y="298" text-anchor="middle" fill="#64748b" font-family="system-ui,sans-serif" font-size="9">Demonstrations are supervised; competency is recorded per UNIPOD policy.</text>
+</svg>

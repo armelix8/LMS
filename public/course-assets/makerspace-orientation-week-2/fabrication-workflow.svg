@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 200" fill="none" aria-labelledby="title desc" role="img">
+  <title id="title">Fabrication workflow</title>
+  <desc id="desc">Linear flow from brief to design, preparation, machine execution, inspection, and documentation.</desc>
+  <rect width="640" height="200" fill="#f8fafc"/>
+  <text x="320" y="28" text-anchor="middle" fill="#0f172a" font-family="system-ui,sans-serif" font-size="14" font-weight="700">Typical digital fabrication workflow</text>
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 Z" fill="#0f766e"/>
+    </marker>
+  </defs>
+  <g font-family="system-ui,sans-serif" font-size="10" fill="#134e4a">
+    <rect x="24" y="56" width="100" height="56" rx="8" fill="#ecfdf5" stroke="#0d9488" stroke-width="1.5"/>
+    <text x="74" y="82" text-anchor="middle" font-weight="600">Brief &amp;</text>
+    <text x="74" y="96" text-anchor="middle" font-weight="600">risk check</text>
+    <line x1="124" y1="84" x2="148" y2="84" stroke="#0f766e" stroke-width="2" marker-end="url(#arrow)"/>
+    <rect x="148" y="56" width="100" height="56" rx="8" fill="#e0f2fe" stroke="#0284c7" stroke-width="1.5"/>
+    <text x="198" y="82" text-anchor="middle" font-weight="600">Design /</text>
+    <text x="198" y="96" text-anchor="middle" font-weight="600">CAM file</text>
+    <line x1="248" y1="84" x2="272" y2="84" stroke="#0f766e" stroke-width="2" marker-end="url(#arrow)"/>
+    <rect x="272" y="56" width="100" height="56" rx="8" fill="#fef9c3" stroke="#ca8a04" stroke-width="1.5"/>
+    <text x="322" y="82" text-anchor="middle" font-weight="600">Material &amp;</text>
+    <text x="322" y="96" text-anchor="middle" font-weight="600">setup</text>
+    <line x1="372" y1="84" x2="396" y2="84" stroke="#0f766e" stroke-width="2" marker-end="url(#arrow)"/>
+    <rect x="396" y="56" width="100" height="56" rx="8" fill="#fce7f3" stroke="#db2777" stroke-width="1.5"/>
+    <text x="446" y="82" text-anchor="middle" font-weight="600">Supervised</text>
+    <text x="446" y="96" text-anchor="middle" font-weight="600">machine run</text>
+    <line x1="496" y1="84" x2="520" y2="84" stroke="#0f766e" stroke-width="2" marker-end="url(#arrow)"/>
+    <rect x="520" y="56" width="96" height="56" rx="8" fill="#f1f5f9" stroke="#475569" stroke-width="1.5"/>
+    <text x="568" y="82" text-anchor="middle" font-weight="600">Inspect</text>
+    <text x="568" y="96" text-anchor="middle" font-weight="600">&amp; log</text>
+  </g>
+  <text x="320" y="168" text-anchor="middle" fill="#64748b" font-family="system-ui,sans-serif" font-size="10">Booking, training level, and machine-specific steps are defined in your lab SOP  never skip induction.</text>
+</svg>

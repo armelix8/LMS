@@ -1,8 +1,16 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
+/* UniPod brand — sky blue wordmark, yellow accent (i-dot), UR teal seal */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f0fdfa;
+  --foreground: #0f172a;
+  --brand: #0ea5e9;
+  --brand-muted: #38bdf8;
+  --brand-strong: #0284c7;
+  --brand-accent: #facc15;
+  --brand-teal: #0f766e;
+  --brand-teal-dark: #115e59;
 }
 
 @theme inline {
@@ -14,13 +22,19 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #0f172a;
+    --foreground: #f1f5f9;
+    --brand: #38bdf8;
+    --brand-muted: #7dd3fc;
+    --brand-strong: #0ea5e9;
+    --brand-accent: #fde047;
+    --brand-teal: #2dd4bf;
+    --brand-teal-dark: #5eead4;
   }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
 }

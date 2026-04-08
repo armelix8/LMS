@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 280" fill="none" aria-labelledby="title desc" role="img">
+  <title id="title">Layered personal protective equipment</title>
+  <desc id="desc">Icons for eyes, hearing, hands, and clothing as typical PPE layers in a makerspace.</desc>
+  <rect width="520" height="280" fill="#f8fafc"/>
+  <text x="260" y="32" text-anchor="middle" fill="#0f172a" font-family="system-ui,sans-serif" font-size="15" font-weight="700">PPE layers (match task &amp; equipment SOP)</text>
+  <g transform="translate(40,60)">
+    <circle cx="50" cy="50" r="44" fill="#e0f2fe" stroke="#0284c7" stroke-width="2"/>
+    <text x="50" y="48" text-anchor="middle" fill="#0369a1" font-family="system-ui,sans-serif" font-size="11" font-weight="600">Eyes</text>
+    <text x="50" y="64" text-anchor="middle" fill="#0369a1" font-family="system-ui,sans-serif" font-size="9">Safety glasses</text>
+    <text x="50" y="78" text-anchor="middle" fill="#0369a1" font-family="system-ui,sans-serif" font-size="9">Face shield when needed</text>
+  </g>
+  <g transform="translate(150,60)">
+    <circle cx="50" cy="50" r="44" fill="#fef3c7" stroke="#d97706" stroke-width="2"/>
+    <text x="50" y="48" text-anchor="middle" fill="#92400e" font-family="system-ui,sans-serif" font-size="11" font-weight="600">Hearing</text>
+    <text x="50" y="64" text-anchor="middle" fill="#92400e" font-family="system-ui,sans-serif" font-size="9">Ear plugs / muffs</text>
+    <text x="50" y="78" text-anchor="middle" fill="#92400e" font-family="system-ui,sans-serif" font-size="9">for loud tools</text>
+  </g>
+  <g transform="translate(260,60)">
+    <circle cx="50" cy="50" r="44" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+    <text x="50" y="48" text-anchor="middle" fill="#166534" font-family="system-ui,sans-serif" font-size="11" font-weight="600">Hands</text>
+    <text x="50" y="64" text-anchor="middle" fill="#166534" font-family="system-ui,sans-serif" font-size="9">Cut-resistant / heat</text>
+    <text x="50" y="78" text-anchor="middle" fill="#166534" font-family="system-ui,sans-serif" font-size="9">Never near rotating CNC</text>
+  </g>
+  <g transform="translate(370,60)">
+    <circle cx="50" cy="50" r="44" fill="#fce7f3" stroke="#db2777" stroke-width="2"/>
+    <text x="50" y="48" text-anchor="middle" fill="#9d174d" font-family="system-ui,sans-serif" font-size="11" font-weight="600">Clothing</text>
+    <text x="50" y="64" text-anchor="middle" fill="#9d174d" font-family="system-ui,sans-serif" font-size="9">Closed shoes</text>
+    <text x="50" y="78" text-anchor="middle" fill="#9d174d" font-family="system-ui,sans-serif" font-size="9">Tie hair, no dangles</text>
+  </g>
+  <rect x="40" y="180" width="440" height="72" rx="8" fill="#fff7ed" stroke="#ea580c" stroke-width="1"/>
+  <text x="260" y="208" text-anchor="middle" fill="#9a3412" font-family="system-ui,sans-serif" font-size="11" font-weight="600">Always follow UNIPOD posted SOPs, signage, and staff instructions  this diagram is illustrative only.</text>
+  <text x="260" y="228" text-anchor="middle" fill="#c2410c" font-family="system-ui,sans-serif" font-size="10">Report incidents, near-misses, and damaged equipment immediately.</text>
+</svg>
