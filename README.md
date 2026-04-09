@@ -4,12 +4,13 @@ UniPod LMS is a role-based learning management platform built for course deliver
 
 ## Core Capabilities
 
-- Authentication with role-aware access (`LEARNER`, `INSTRUCTOR`, `ADMIN`)
+- Authentication with role-aware access (Learner [`STUDENT` role], `INSTRUCTOR`, `ADMIN`)
 - Course catalog and lesson-based learning experience
 - Instructor dashboard for course management and learner oversight
 - Admin program management (programs, cohorts, phases, memberships)
 - Notifications center and header notification tray
 - Assignment submission and review flows
+- Lab management (labs, equipment, facilities, bookings, maintenance)
 - Media and asset handling under `public/`
 
 ## Tech Stack
@@ -28,6 +29,7 @@ UniPod LMS is a role-based learning management platform built for course deliver
 - `prisma/` - schema, migrations, and seed scripts
 - `public/` - static assets and uploaded files
 - `types/` - shared type declarations
+- `docs/lab-management.md` - lab module API, roles, and usage notes
 
 ## Prerequisites
 

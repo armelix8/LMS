@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import type { Role } from "@prisma/client";
 import type { HeaderSessionUser } from "@/components/header-types";
@@ -17,6 +16,8 @@ function roleLabel(role: Role): string {
       return "Administrator";
     case "INSTRUCTOR":
       return "Instructor";
+    case "LAB_TECHNICIAN":
+      return "Lab Technician";
     default:
       return "Learner";
   }
@@ -28,11 +29,6 @@ const menuItemClass =
 export function UserAccountMenu({ user, signOutAction }: Props) {
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
-  const pathname = usePathname();
-
-  useEffect(() => {
-    setOpen(false);
-  }, [pathname]);
 
   useEffect(() => {
     function onDoc(e: MouseEvent) {
@@ -160,6 +156,16 @@ export function UserAccountMenu({ user, signOutAction }: Props) {
                 onClick={() => setOpen(false)}
               >
                 Instructor
+              </Link>
+            )}
+            {(user.role === "LAB_TECHNICIAN" || user.role === "ADMIN") && (
+              <Link
+                href="/labs/maintenance"
+                className={menuItemClass}
+                role="menuitem"
+                onClick={() => setOpen(false)}
+              >
+                Maintenance
               </Link>
             )}
             {user.role === "ADMIN" && (

@@ -6,6 +6,8 @@ const IMAGE_EXT = new Set([".png", ".jpg", ".jpeg", ".webp", ".gif"]);
 
 const MAX_COURSE_COVER_BYTES = 10 * 1024 * 1024;
 const MAX_AVATAR_BYTES = 5 * 1024 * 1024;
+const MAX_LAB_FEATURED_BYTES = 10 * 1024 * 1024;
+const MAX_EQUIPMENT_FEATURED_BYTES = 10 * 1024 * 1024;
 
 function extension(name: string): string {
   const i = name.lastIndexOf(".");
@@ -43,7 +45,27 @@ export function validateAvatarImage(
   return { ok: true };
 }
 
-/** Remove a file we stored under public/uploads/courses/ or public/uploads/avatars/. */
+export function validateLabFeaturedImage(
+  file: File,
+): { ok: true } | { ok: false; reason: "size" | "type" } {
+  if (file.size > MAX_LAB_FEATURED_BYTES) return { ok: false, reason: "size" };
+  const ext = extension(file.name);
+  if (!ext || !IMAGE_EXT.has(ext)) return { ok: false, reason: "type" };
+  return { ok: true };
+}
+
+export function validateEquipmentFeaturedImage(
+  file: File,
+): { ok: true } | { ok: false; reason: "size" | "type" } {
+  if (file.size > MAX_EQUIPMENT_FEATURED_BYTES) {
+    return { ok: false, reason: "size" };
+  }
+  const ext = extension(file.name);
+  if (!ext || !IMAGE_EXT.has(ext)) return { ok: false, reason: "type" };
+  return { ok: true };
+}
+
+/** Remove a file we stored under known public uploads paths. */
 export async function deletePublicUploadFile(
   publicUrl: string | null | undefined,
 ): Promise<void> {
@@ -51,7 +73,10 @@ export async function deletePublicUploadFile(
   const rel = publicUrl.slice(1);
   if (rel.includes("..")) return;
   const ok =
-    rel.startsWith("uploads/courses/") || rel.startsWith("uploads/avatars/");
+    rel.startsWith("uploads/courses/") ||
+    rel.startsWith("uploads/avatars/") ||
+    rel.startsWith("uploads/labs/") ||
+    rel.startsWith("uploads/equipment/");
   if (!ok) return;
   const local = join(process.cwd(), "public", rel);
   try {
@@ -94,4 +119,30 @@ export async function saveAvatarUpload(
   const path = join(dir, name);
   await writeFile(path, Buffer.from(await file.arrayBuffer()));
   return { url: `/uploads/avatars/${userId}/${name}` };
+}
+
+export async function saveLabFeaturedUpload(
+  labId: string,
+  file: File,
+): Promise<{ url: string }> {
+  const ext = extension(file.name) || ".jpg";
+  const name = `${randomUUID()}${ext}`;
+  const dir = join(process.cwd(), "public", "uploads", "labs", labId);
+  await mkdir(dir, { recursive: true });
+  const path = join(dir, name);
+  await writeFile(path, Buffer.from(await file.arrayBuffer()));
+  return { url: `/uploads/labs/${labId}/${name}` };
+}
+
+export async function saveEquipmentFeaturedUpload(
+  equipmentId: string,
+  file: File,
+): Promise<{ url: string }> {
+  const ext = extension(file.name) || ".jpg";
+  const name = `${randomUUID()}${ext}`;
+  const dir = join(process.cwd(), "public", "uploads", "equipment", equipmentId);
+  await mkdir(dir, { recursive: true });
+  const path = join(dir, name);
+  await writeFile(path, Buffer.from(await file.arrayBuffer()));
+  return { url: `/uploads/equipment/${equipmentId}/${name}` };
 }

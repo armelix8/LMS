@@ -1291,6 +1291,110 @@ Files must be legible. Instructor approval is required before this lesson can be
     });
   }
 
+  const demoLabName = "UNIPOD Digital Fabrication Lab";
+  const demoLabLocation = "UNIPOD Campus - Building A";
+  let demoLab = await prisma.lab.findFirst({
+    where: { name: demoLabName, location: demoLabLocation },
+  });
+  if (!demoLab) {
+    demoLab = await prisma.lab.create({
+      data: {
+        name: demoLabName,
+        description:
+          "Demo lab space for fabrication workflows, prototyping, and safety training.",
+        location: demoLabLocation,
+        capacity: 30,
+        labType: "THREE_D_PRINTING",
+        status: "ACTIVE",
+      },
+    });
+  }
+
+  const demoFacilities = [
+    {
+      name: "3D Printing Workstation A",
+      type: "3D Printer",
+      availabilityStatus: "AVAILABLE" as const,
+      usageRules:
+        "Use only after orientation. PLA/PETG only. Booking required for print jobs over 2 hours.",
+    },
+    {
+      name: "Laser Cutting Bay 1",
+      type: "Laser Cutter",
+      availabilityStatus: "AVAILABLE" as const,
+      usageRules:
+        "Approved materials only. Operator must remain present during active cuts.",
+    },
+    {
+      name: "Electronics Bench E-02",
+      type: "Electronics Bench",
+      availabilityStatus: "AVAILABLE" as const,
+      usageRules:
+        "Observe ESD policy and keep bench clear after use. Shared tools must be returned.",
+    },
+  ];
+
+  for (const facility of demoFacilities) {
+    const existing = await prisma.facility.findFirst({
+      where: { labId: demoLab.id, name: facility.name },
+    });
+    if (!existing) {
+      await prisma.facility.create({
+        data: {
+          labId: demoLab.id,
+          name: facility.name,
+          type: facility.type,
+          availabilityStatus: facility.availabilityStatus,
+          usageRules: facility.usageRules,
+        },
+      });
+    }
+  }
+
+  const demoEquipment = [
+    {
+      name: "Prusa i3 MK4 - Unit 01",
+      category: "3D Printer",
+      brand: "Prusa",
+      model: "i3 MK4",
+      serialNumber: "UPD-PRUSA-MK4-01",
+      condition: "Good",
+      status: "AVAILABLE" as const,
+      description: "FDM printer for rapid prototype production.",
+    },
+    {
+      name: "OMTech CO2 Laser 60W",
+      category: "Laser Cutter",
+      brand: "OMTech",
+      model: "60W CO2",
+      serialNumber: "UPD-LASER-60W-01",
+      condition: "Good",
+      status: "AVAILABLE" as const,
+      description: "CO2 laser cutter for acrylic, wood, and cardboard projects.",
+    },
+  ];
+
+  for (const equipment of demoEquipment) {
+    const existing = await prisma.equipment.findFirst({
+      where: { serialNumber: equipment.serialNumber },
+    });
+    if (!existing) {
+      await prisma.equipment.create({
+        data: {
+          labId: demoLab.id,
+          name: equipment.name,
+          category: equipment.category,
+          brand: equipment.brand,
+          model: equipment.model,
+          serialNumber: equipment.serialNumber,
+          condition: equipment.condition,
+          status: equipment.status,
+          description: equipment.description,
+        },
+      });
+    }
+  }
+
   await seedInnovationTrackCourses(prisma, instructor.id, student.id);
   await seedPDPProgram(prisma);
 

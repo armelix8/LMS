@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { auth } from "@/auth";
-import { applyToCohortFromProgramPage } from "@/app/actions/programs";
 import {
   CourseMetaStat,
   IconLayers,
@@ -24,11 +23,6 @@ export async function generateMetadata({
   });
   return { title: p?.title ?? "Program" };
 }
-
-const btnPrimary =
-  "inline-flex min-h-11 w-full items-center justify-center rounded-2xl bg-gradient-to-r from-sky-600 to-teal-600 px-5 text-sm font-semibold text-white shadow-md transition hover:from-sky-500 hover:to-teal-500 sm:w-auto";
-const btnSecondary =
-  "inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-slate-300/90 bg-white px-5 text-sm font-semibold text-slate-800 shadow-sm transition hover:border-teal-700/20 hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:hover:border-teal-500/30 dark:hover:bg-slate-800/90 sm:w-auto";
 
 export default async function ProgramPublicPage({
   params,
@@ -69,6 +63,12 @@ export default async function ProgramPublicPage({
 
   const phaseCount = program.phases.length;
   const cohortCount = program.cohorts.length;
+  const openCohorts = program.cohorts.filter((c) =>
+    cohortApplicationsWindowOpen(c),
+  );
+  const closedCohorts = program.cohorts.filter(
+    (c) => !cohortApplicationsWindowOpen(c),
+  );
 
   return (
     <main className="flex-1">
@@ -157,9 +157,114 @@ export default async function ProgramPublicPage({
                   />
                 </div>
                 <div className="mt-6 border-t border-slate-100 pt-6 dark:border-slate-800">
+                  <h3 className="text-base font-semibold text-slate-900 dark:text-white">
+                    Cohorts
+                  </h3>
+                  <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                    Each cohort runs the same program structure. Apply when the
+                    window is open, or access your cohort if you have already
+                    been enrolled.
+                  </p>
+
+                  <div className="mt-4 border-t border-slate-100 pt-4 dark:border-slate-800">
+                  <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
+                    Open cohorts
+                  </h3>
+                  <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                    Applications are currently open.
+                  </p>
+                  {openCohorts.length === 0 ? (
+                    <p className="mt-3 text-sm text-slate-500 dark:text-slate-400">
+                      No open cohorts right now.
+                    </p>
+                  ) : (
+                    <ul className="mt-3 space-y-2">
+                      {openCohorts.map((c) => {
+                        const status = membershipByCohortId.get(c.id);
+                        return (
+                          <li
+                            key={c.id}
+                            className="rounded-xl border border-emerald-200/80 bg-emerald-50/70 px-3 py-3 dark:border-emerald-900/40 dark:bg-emerald-950/20"
+                          >
+                            <div className="flex items-start justify-between gap-2">
+                              <p className="text-sm font-medium text-slate-900 dark:text-slate-100">
+                                {c.name}
+                              </p>
+                              <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-semibold text-emerald-900 dark:bg-emerald-950/70 dark:text-emerald-200">
+                                Open
+                              </span>
+                            </div>
+                            {status ? (
+                              <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                                Your status: {cohortMemberStatusLabel(status)}
+                              </p>
+                            ) : null}
+                            {status === "ACTIVE" ? (
+                              <Link
+                                href={`/programs/${program.slug}/cohorts/${c.slug}`}
+                                className="mt-2 inline-flex text-xs font-semibold text-sky-700 hover:text-sky-600 dark:text-sky-300 dark:hover:text-sky-200"
+                              >
+                                Open cohort
+                              </Link>
+                            ) : null}
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  )}
+                  </div>
+
+                  <div className="mt-5 border-t border-slate-100 pt-5 dark:border-slate-800">
+                  <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
+                    Closed cohorts
+                  </h3>
+                  <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                    Applications are currently closed.
+                  </p>
+                  {closedCohorts.length === 0 ? (
+                    <p className="mt-3 text-sm text-slate-500 dark:text-slate-400">
+                      No closed cohorts.
+                    </p>
+                  ) : (
+                    <ul className="mt-3 space-y-2">
+                      {closedCohorts.map((c) => {
+                        const status = membershipByCohortId.get(c.id);
+                        return (
+                          <li
+                            key={c.id}
+                            className="rounded-xl border border-slate-200/80 bg-slate-50/80 px-3 py-3 dark:border-slate-700 dark:bg-slate-800/60"
+                          >
+                            <div className="flex items-start justify-between gap-2">
+                              <p className="text-sm font-medium text-slate-900 dark:text-slate-100">
+                                {c.name}
+                              </p>
+                              <span className="rounded-full bg-slate-200 px-2 py-0.5 text-[11px] font-semibold text-slate-700 dark:bg-slate-700 dark:text-slate-200">
+                                Closed
+                              </span>
+                            </div>
+                            {status ? (
+                              <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                                Your status: {cohortMemberStatusLabel(status)}
+                              </p>
+                            ) : null}
+                            {status === "ACTIVE" ? (
+                              <Link
+                                href={`/programs/${program.slug}/cohorts/${c.slug}`}
+                                className="mt-2 inline-flex text-xs font-semibold text-sky-700 hover:text-sky-600 dark:text-sky-300 dark:hover:text-sky-200"
+                              >
+                                Open cohort
+                              </Link>
+                            ) : null}
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  )}
+                  </div>
+
                   <Link
                     href="/dashboard"
-                    className="flex w-full items-center justify-center rounded-2xl border border-slate-200 bg-slate-50 py-3 text-sm font-semibold text-slate-800 transition hover:bg-slate-100 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700"
+                    className="mt-5 flex w-full items-center justify-center rounded-2xl border border-slate-200 bg-slate-50 py-3 text-sm font-semibold text-slate-800 transition hover:bg-slate-100 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700"
                   >
                     Dashboard
                   </Link>
@@ -217,110 +322,6 @@ export default async function ProgramPublicPage({
           )}
         </section>
 
-        <section className="mt-16" aria-labelledby="cohorts-heading">
-          <div className="flex flex-col gap-2">
-            <h2
-              id="cohorts-heading"
-              className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white"
-            >
-              Cohorts
-            </h2>
-            <p className="max-w-2xl text-sm text-slate-500 dark:text-slate-400">
-              Each cohort runs the same program structure. Apply when the window
-              is open, or access your cohort if you have already been enrolled.
-            </p>
-          </div>
-
-          <ul className="mt-10 space-y-6">
-            {program.cohorts.length === 0 ? (
-              <li className="rounded-3xl border border-dashed border-slate-300 px-8 py-14 text-center text-sm text-slate-600 dark:border-slate-700 dark:text-slate-400">
-                No cohorts are available for this program yet.
-              </li>
-            ) : (
-              program.cohorts.map((c) => {
-                const open = cohortApplicationsWindowOpen(c);
-                const status = membershipByCohortId.get(c.id);
-                return (
-                  <li key={c.id}>
-                    <article className="rounded-3xl border border-slate-200/90 bg-white p-6 shadow-[0_1px_0_rgba(15,118,110,0.04),0_12px_32px_-8px_rgba(15,23,42,0.08)] dark:border-slate-800 dark:bg-slate-900/50 dark:shadow-none sm:p-8">
-                      <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
-                        <div className="min-w-0 flex-1">
-                          <div className="flex flex-wrap items-center gap-3">
-                            <h3 className="text-xl font-bold text-slate-900 dark:text-white">
-                              {c.name}
-                            </h3>
-                            <span
-                              className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
-                                open
-                                  ? "bg-emerald-100 text-emerald-900 dark:bg-emerald-950/70 dark:text-emerald-200"
-                                  : "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400"
-                              }`}
-                            >
-                              {open ? "Accepting applications" : "Closed"}
-                            </span>
-                          </div>
-                          {status ? (
-                            <p className="mt-4 text-sm text-slate-600 dark:text-slate-400">
-                              <span className="text-slate-500 dark:text-slate-500">
-                                Your status:{" "}
-                              </span>
-                              <span className="font-semibold text-slate-900 dark:text-white">
-                                {cohortMemberStatusLabel(status)}
-                              </span>
-                            </p>
-                          ) : null}
-                        </div>
-                        <div className="flex shrink-0 flex-col items-stretch gap-3 lg:min-w-[12rem] lg:items-end">
-                          {status === "ACTIVE" ? (
-                            <Link
-                              href={`/programs/${program.slug}/cohorts/${c.slug}`}
-                              className={btnPrimary}
-                            >
-                              Cohort progress
-                            </Link>
-                          ) : null}
-                          {session?.user && status === "APPLIED" ? (
-                            <span className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-center text-xs font-medium text-amber-900 dark:border-amber-900/40 dark:bg-amber-950/40 dark:text-amber-200">
-                              Application under review
-                            </span>
-                          ) : null}
-                          {session?.user &&
-                          open &&
-                          (status == null ||
-                            status === "REJECTED" ||
-                            status === "WITHDRAWN") ? (
-                            <form
-                              action={applyToCohortFromProgramPage.bind(
-                                null,
-                                program.slug,
-                                c.slug,
-                                c.id,
-                              )}
-                            >
-                              <button type="submit" className={`w-full ${btnSecondary}`}>
-                                {status === "REJECTED" || status === "WITHDRAWN"
-                                  ? "Apply again"
-                                  : "Request to join"}
-                              </button>
-                            </form>
-                          ) : null}
-                          {!session?.user && open ? (
-                            <Link
-                              href={`/auth/signin?callbackUrl=/programs/${program.slug}`}
-                              className={`text-center ${btnSecondary}`}
-                            >
-                              Sign in to apply
-                            </Link>
-                          ) : null}
-                        </div>
-                      </div>
-                    </article>
-                  </li>
-                );
-              })
-            )}
-          </ul>
-        </section>
       </div>
     </main>
   );

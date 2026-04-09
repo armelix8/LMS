@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { NotificationTray } from "@/components/notification-tray";
 import { UserAccountMenu } from "@/components/user-account-menu";
 import type { HeaderSessionUser } from "@/components/header-types";
@@ -23,9 +23,11 @@ type Props = {
 function NavItem({
   href,
   children,
+  showChevron = false,
 }: {
   href: string;
   children: React.ReactNode;
+  showChevron?: boolean;
 }) {
   const pathname = usePathname();
   const active =
@@ -36,14 +38,26 @@ function NavItem({
   return (
     <Link
       href={href}
-      className={`rounded-full px-3.5 py-2 text-sm font-medium transition-colors ${
+      className={`inline-flex items-center gap-1 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
         active
-          ? "bg-sky-50 text-sky-900 shadow-sm ring-1 ring-sky-200/90 dark:bg-sky-950/50 dark:text-sky-100 dark:ring-sky-700/60"
-          : "text-slate-600 hover:bg-teal-50/80 hover:text-teal-900 dark:text-slate-400 dark:hover:bg-teal-950/40 dark:hover:text-teal-100"
+          ? "text-sky-700 dark:text-sky-300"
+          : "text-slate-700 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white"
       }`}
       aria-current={active ? "page" : undefined}
     >
       {children}
+      {showChevron ? (
+        <svg
+          className="h-3.5 w-3.5"
+          viewBox="0 0 20 20"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.75"
+          aria-hidden
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d="m6 8 4 4 4-4" />
+        </svg>
+      ) : null}
     </Link>
   );
 }
@@ -54,15 +68,10 @@ export function SiteHeaderNav({
   notificationPreview,
 }: Props) {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const pathname = usePathname();
-
-  useEffect(() => {
-    setMobileOpen(false);
-  }, [pathname]);
 
   return (
     <>
-      <div className="mx-auto flex h-[4.25rem] max-w-6xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto flex h-[4.25rem] max-w-[88rem] items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
         <Link
           href="/"
           className="group flex min-w-0 shrink items-center gap-3"
@@ -70,33 +79,53 @@ export function SiteHeaderNav({
         >
           <Image
             src="/brand/unipod-logo.png"
-            alt="UniPod — University of Rwanda"
-            width={240}
-            height={56}
-            className="h-10 w-auto max-w-[200px] object-contain object-left sm:max-w-[240px] sm:h-11"
+            alt="UR UniPod"
+            width={220}
+            height={52}
+            className="h-9 w-auto max-w-[180px] object-contain object-left sm:h-10 sm:max-w-[220px]"
             priority
           />
-          <span className="hidden min-w-0 flex-col border-l border-teal-200/80 pl-3 leading-tight sm:flex dark:border-teal-700/50">
-            <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-teal-800 dark:text-teal-200">
-              Learn
+          <span className="hidden min-w-0 flex-col border-l border-slate-200 pl-3 leading-tight sm:flex dark:border-slate-700">
+            <span className="text-xs font-semibold text-slate-900 dark:text-white">
+              UR UniPod
             </span>
             <span className="text-[10px] font-medium text-slate-500 dark:text-slate-400">
-              LMS
+              Creativity starts here
             </span>
           </span>
         </Link>
 
         <nav
-          className="hidden flex-1 items-center justify-center gap-0.5 md:flex"
+          className="hidden flex-1 items-center justify-center gap-0.5 lg:flex"
           aria-label="Main"
         >
-          <div className="inline-flex items-center gap-0.5 rounded-full border border-teal-900/10 bg-gradient-to-b from-white to-teal-50/40 p-1 shadow-inner dark:border-teal-500/15 dark:from-slate-900/80 dark:to-teal-950/30">
-            <NavItem href="/courses">Courses</NavItem>
+          <div className="inline-flex items-center gap-1">
+            <NavItem href="/">Home</NavItem>
             <NavItem href="/programs">Programs</NavItem>
+            <NavItem href="/courses">Courses</NavItem>
+            {user ? <NavItem href="/labs">Labs</NavItem> : null}
+            {user ? <NavItem href="/dashboard">Dashboard</NavItem> : null}
           </div>
         </nav>
 
-        <div className="hidden items-center gap-3 md:flex">
+        <div className="hidden items-center gap-3 lg:flex">
+          <button
+            type="button"
+            aria-label="Theme"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
+          >
+            <svg
+              className="h-4 w-4"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              aria-hidden
+            >
+              <circle cx="12" cy="12" r="4" />
+              <path strokeLinecap="round" d="M12 2v2.5M12 19.5V22M4.93 4.93l1.77 1.77M17.3 17.3l1.77 1.77M2 12h2.5M19.5 12H22M4.93 19.07l1.77-1.77M17.3 6.7l1.77-1.77" />
+            </svg>
+          </button>
           {user && notificationPreview ? (
             <NotificationTray
               unreadCount={notificationPreview.unreadCount}
@@ -109,21 +138,21 @@ export function SiteHeaderNav({
             <div className="flex items-center gap-2">
               <Link
                 href="/auth/signin"
-                className="rounded-full px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-teal-50 dark:text-slate-300 dark:hover:bg-teal-950/40"
+                className="rounded-md px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
               >
                 Sign in
               </Link>
               <Link
                 href="/auth/signup"
-                className="rounded-full bg-sky-500 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-sky-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-yellow-400 dark:bg-sky-600 dark:hover:bg-sky-500"
+                className="rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-400"
               >
-                Get started
+                Get Started
               </Link>
             </div>
           )}
         </div>
 
-        <div className="flex items-center gap-2 md:hidden">
+        <div className="flex items-center gap-2 lg:hidden">
           {user && notificationPreview ? (
             <NotificationTray
               unreadCount={notificationPreview.unreadCount}
@@ -177,46 +206,71 @@ export function SiteHeaderNav({
       {mobileOpen ? (
         <div
           id="mobile-nav"
-          className="border-t border-teal-900/10 bg-gradient-to-b from-teal-50/90 to-white px-4 py-4 dark:border-teal-500/15 dark:from-teal-950/80 dark:to-slate-950 md:hidden"
+          className="border-t border-slate-200 bg-white px-4 py-4 dark:border-slate-800 dark:bg-slate-950 lg:hidden"
         >
           <nav
-            className="mx-auto flex max-w-6xl flex-col gap-1"
+            className="mx-auto flex max-w-[88rem] flex-col gap-1"
             aria-label="Mobile"
           >
             <Link
-              href="/courses"
-              className="rounded-lg px-3 py-2.5 text-sm font-medium text-teal-950 hover:bg-white dark:text-teal-50 dark:hover:bg-slate-900"
+              href="/"
+              className="rounded-lg px-3 py-2.5 text-sm font-medium text-slate-900 hover:bg-slate-100 dark:text-slate-100 dark:hover:bg-slate-900"
               onClick={() => setMobileOpen(false)}
             >
-              Courses
+              Home
             </Link>
             <Link
               href="/programs"
-              className="rounded-lg px-3 py-2.5 text-sm font-medium text-teal-950 hover:bg-white dark:text-teal-50 dark:hover:bg-slate-900"
+              className="rounded-lg px-3 py-2.5 text-sm font-medium text-slate-900 hover:bg-slate-100 dark:text-slate-100 dark:hover:bg-slate-900"
               onClick={() => setMobileOpen(false)}
             >
               Programs
             </Link>
+            <Link
+              href="/courses"
+              className="rounded-lg px-3 py-2.5 text-sm font-medium text-slate-900 hover:bg-slate-100 dark:text-slate-100 dark:hover:bg-slate-900"
+              onClick={() => setMobileOpen(false)}
+            >
+              Courses
+            </Link>
             {user ? (
-              <p className="mt-2 rounded-lg border border-dashed border-teal-300/80 bg-teal-50/50 px-3 py-2 text-xs text-teal-900 dark:border-teal-700/60 dark:bg-teal-950/40 dark:text-teal-200">
+              <Link
+                href="/labs"
+                className="rounded-lg px-3 py-2.5 text-sm font-medium text-slate-900 hover:bg-slate-100 dark:text-slate-100 dark:hover:bg-slate-900"
+                onClick={() => setMobileOpen(false)}
+              >
+                Labs
+              </Link>
+            ) : null}
+            {user ? (
+              <Link
+                href="/dashboard"
+                className="rounded-lg px-3 py-2.5 text-sm font-medium text-slate-900 hover:bg-slate-100 dark:text-slate-100 dark:hover:bg-slate-900"
+                onClick={() => setMobileOpen(false)}
+              >
+                Dashboard
+              </Link>
+            ) : null}
+            {user ? (
+              <p className="mt-2 rounded-lg border border-dashed border-slate-300 px-3 py-2 text-xs text-slate-700 dark:border-slate-700 dark:text-slate-300">
                 Account, dashboard, and sign out are in the menu next to your
                 profile picture.
               </p>
             ) : (
-              <div className="mt-1 flex flex-col gap-2 border-t border-teal-200 pt-3 dark:border-teal-800">
+              <div className="mt-1 flex flex-col gap-2 border-t border-slate-200 pt-3 dark:border-slate-800">
                 <Link
                   href="/auth/signin"
-                  className="rounded-lg px-3 py-2.5 text-center text-sm font-medium text-teal-950 dark:text-teal-50"
+                  className="rounded-lg px-3 py-2.5 text-center text-sm font-medium text-slate-900 dark:text-slate-100"
                   onClick={() => setMobileOpen(false)}
                 >
                   Sign in
                 </Link>
                 <Link
                   href="/auth/signup"
-                  className="rounded-lg bg-sky-500 py-2.5 text-center text-sm font-semibold text-white dark:bg-sky-600"
+                  className="rounded-lg bg-blue-600 py-2.5 text-center text-sm font-semibold text-white"
                   onClick={() => setMobileOpen(false)}
                 >
-                  Get started
+                  Get Started
                 </Link>
               </div>
             )}

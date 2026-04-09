@@ -11,6 +11,7 @@ enum Role {
   STUDENT
   INSTRUCTOR
   ADMIN
+  LAB_TECHNICIAN
 }
 
 enum AssignmentResponseType {
@@ -52,6 +53,48 @@ enum NotificationType {
   ASSIGNMENT_REVIEWED
 }
 
+enum LabType {
+  ELECTRONICS
+  WOODWORKING
+  THREE_D_PRINTING
+  CNC
+  LASER
+  GENERAL
+}
+
+enum LabStatus {
+  ACTIVE
+  MAINTENANCE
+  CLOSED
+}
+
+enum EquipmentStatus {
+  AVAILABLE
+  IN_USE
+  MAINTENANCE
+  BROKEN
+}
+
+enum FacilityAvailabilityStatus {
+  AVAILABLE
+  UNAVAILABLE
+  MAINTENANCE
+}
+
+enum BookingStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  COMPLETED
+  CANCELLED
+}
+
+enum MaintenanceStatus {
+  REPORTED
+  IN_PROGRESS
+  RESOLVED
+}
+
 model User {
   id            String    @id @default(cuid())
   email         String    @unique
@@ -76,6 +119,9 @@ model User {
   cohortMembers     CohortMember[]
   programPhaseAssignmentSubmissions ProgramPhaseAssignmentSubmission[]
   notifications     Notification[]
+  bookings          LabBooking[] @relation("UserBookings")
+  equipmentBookings EquipmentBooking[] @relation("UserEquipmentBookings")
+  reportedMaintenanceLogs MaintenanceLog[] @relation("MaintenanceReporter")
 }
 
 model Account {
@@ -423,4 +469,111 @@ model Notification {
 
   @@index([userId, readAt])
   @@index([userId, createdAt])
+}
+
+model Lab {
+  id          String    @id @default(cuid())
+  name        String
+  description String?   @db.Text
+  featuredImageUrl String?
+  location    String
+  capacity    Int
+  labType     LabType
+  status      LabStatus @default(ACTIVE)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  equipment   Equipment[]
+  facilities  Facility[]
+  bookings    LabBooking[]
+}
+
+model Equipment {
+  id           String          @id @default(cuid())
+  name         String
+  description  String?         @db.Text
+  featuredImageUrl String?
+  labId        String
+  category     String
+  brand        String?
+  model        String?
+  serialNumber String?         @unique
+  purchaseDate DateTime?
+  condition    String?
+  status       EquipmentStatus @default(AVAILABLE)
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  lab          Lab             @relation(fields: [labId], references: [id], onDelete: Cascade)
+  maintenanceLogs MaintenanceLog[]
+  bookings     EquipmentBooking[]
+
+  @@index([labId, status])
+}
+
+model Facility {
+  id                 String                     @id @default(cuid())
+  name               String
+  type               String
+  labId              String
+  availabilityStatus FacilityAvailabilityStatus @default(AVAILABLE)
+  usageRules         String?                    @db.Text
+  createdAt          DateTime                   @default(now())
+  updatedAt          DateTime                   @updatedAt
+
+  lab                Lab                        @relation(fields: [labId], references: [id], onDelete: Cascade)
+
+  @@index([labId, availabilityStatus])
+}
+
+model LabBooking {
+  id         String        @id @default(cuid())
+  userId     String
+  labId      String
+  startTime  DateTime
+  endTime    DateTime
+  status     BookingStatus @default(PENDING)
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+
+  user       User          @relation("UserBookings", fields: [userId], references: [id], onDelete: Cascade)
+  lab        Lab           @relation(fields: [labId], references: [id], onDelete: Cascade)
+
+  @@index([labId, startTime, endTime])
+  @@index([userId, status])
+}
+
+model EquipmentBooking {
+  id          String        @id @default(cuid())
+  userId      String
+  equipmentId String
+  startTime   DateTime
+  endTime     DateTime
+  status      BookingStatus @default(PENDING)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  user        User          @relation("UserEquipmentBookings", fields: [userId], references: [id], onDelete: Cascade)
+  equipment   Equipment     @relation(fields: [equipmentId], references: [id], onDelete: Cascade)
+
+  @@index([equipmentId, startTime, endTime])
+  @@index([userId, status])
+}
+
+model MaintenanceLog {
+  id                String            @id @default(cuid())
+  equipmentId       String
+  reportedById      String
+  issueDescription  String            @db.Text
+  maintenanceStatus MaintenanceStatus @default(REPORTED)
+  technician        String?
+  resolvedAt        DateTime?
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+
+  equipment         Equipment         @relation(fields: [equipmentId], references: [id], onDelete: Cascade)
+  reportedBy        User              @relation("MaintenanceReporter", fields: [reportedById], references: [id], onDelete: Cascade)
+
+  @@index([equipmentId, maintenanceStatus])
+  @@index([reportedById, createdAt])
 }
