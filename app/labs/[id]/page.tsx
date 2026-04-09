@@ -359,6 +359,11 @@ export default async function LabDetailPage({ params, searchParams }: Props) {
                                     minute: "2-digit",
                                   })}
                                 </p>
+                                {cellItems[0].purpose ? (
+                                  <p className="mt-0.5 line-clamp-2 text-[9px] text-slate-600 dark:text-slate-400">
+                                    {cellItems[0].purpose}
+                                  </p>
+                                ) : null}
                                 {cellItems.length > 1 ? (
                                   <p className="mt-0.5 text-[9px]">
                                     +{cellItems.length - 1} more
@@ -450,6 +455,14 @@ export default async function LabDetailPage({ params, searchParams }: Props) {
                 <p className="text-slate-600 dark:text-slate-400">
                   {b.startTime.toLocaleString()} - {b.endTime.toLocaleString()}
                 </p>
+                {b.purpose ? (
+                  <p className="mt-2 whitespace-pre-wrap text-xs text-slate-700 dark:text-slate-300">
+                    <span className="font-medium text-slate-500 dark:text-slate-400">
+                      Why:{" "}
+                    </span>
+                    {b.purpose}
+                  </p>
+                ) : null}
                 <p className="mt-1">
                   <span
                     className={`rounded-md px-2 py-0.5 text-xs font-semibold ${statusBadgeClass(b.status)}`}

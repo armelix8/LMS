@@ -11,12 +11,13 @@ import {
   formatMaintenanceStatus,
   statusBadgeClass,
 } from "@/lib/lab-display";
+import { BOOKING_PURPOSE_MAX_LEN } from "@/lib/booking-purpose";
 import { canManageBookings, canManageEquipment } from "@/lib/lab-permissions";
 import { prisma } from "@/lib/prisma";
 
 type Props = {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ tab?: string }>;
+  searchParams: Promise<{ tab?: string; error?: string }>;
 };
 
 type TabKey = "details" | "maintenance";
@@ -30,6 +31,12 @@ export default async function EquipmentDetailPage({
   const { id } = await params;
   const sp = await searchParams;
   const activeTab: TabKey = sp.tab === "maintenance" ? "maintenance" : "details";
+  const bookingOverlapMessage =
+    sp.error === "overlap"
+      ? "That time overlaps an existing pending or approved booking for this equipment. Pick another slot."
+      : sp.error === "past"
+        ? "Start time must be in the future. You cannot book a slot that has already begun."
+        : null;
 
   const equipment = await prisma.equipment.findUnique({
     where: { id },
@@ -85,6 +92,15 @@ export default async function EquipmentDetailPage({
           </Link>
         ) : null}
       </div>
+
+      {bookingOverlapMessage ? (
+        <div
+          className="mt-4 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-950 dark:border-amber-700 dark:bg-amber-950/40 dark:text-amber-100"
+          role="alert"
+        >
+          {bookingOverlapMessage}
+        </div>
+      ) : null}
 
       <section className="mt-4 grid gap-6 lg:grid-cols-[minmax(0,1fr)_17rem]">
         <div className="flex items-start gap-4 rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900/50">
@@ -236,6 +252,12 @@ export default async function EquipmentDetailPage({
                       {formatBookingStatus(b.status)}
                     </span>
                   </p>
+                  {b.purpose ? (
+                    <p className="mt-1 line-clamp-2 text-[10px] text-slate-600 dark:text-slate-400">
+                      <span className="font-medium text-slate-500">Why: </span>
+                      {b.purpose}
+                    </p>
+                  ) : null}
                 </li>
               ))}
               {bookingSummary.length === 0 ? (
@@ -248,6 +270,11 @@ export default async function EquipmentDetailPage({
               action={createEquipmentBookingAction.bind(null, equipment.id)}
               className="mt-3 space-y-2 rounded-lg border border-slate-200 p-3 dark:border-slate-700"
             >
+              <input
+                type="hidden"
+                name="fromEquipmentDetail"
+                value={equipment.id}
+              />
               <label className="block text-xs font-medium text-slate-700 dark:text-slate-300">
                 Start
                 <input
@@ -264,6 +291,17 @@ export default async function EquipmentDetailPage({
                   name="endTime"
                   required
                   className="mt-1 w-full rounded-md border border-slate-300 px-2 py-1 text-xs dark:border-slate-700 dark:bg-slate-900"
+                />
+              </label>
+              <label className="block text-xs font-medium text-slate-700 dark:text-slate-300">
+                Why do you need this?
+                <textarea
+                  name="purpose"
+                  required
+                  rows={3}
+                  maxLength={BOOKING_PURPOSE_MAX_LEN}
+                  placeholder="Short reason for staff review"
+                  className="mt-1 w-full resize-y rounded-md border border-slate-300 px-2 py-1 text-xs leading-relaxed dark:border-slate-700 dark:bg-slate-900"
                 />
               </label>
               <button className="w-full rounded-md bg-sky-600 px-2 py-1.5 text-xs font-semibold text-white hover:bg-sky-500">

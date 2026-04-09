@@ -532,6 +532,8 @@ model LabBooking {
   labId      String
   startTime  DateTime
   endTime    DateTime
+  /// Why the learner needs the lab (shown to reviewers and on the calendar).
+  purpose    String?       @db.Text
   status     BookingStatus @default(PENDING)
   createdAt  DateTime      @default(now())
   updatedAt  DateTime      @updatedAt
@@ -549,6 +551,8 @@ model EquipmentBooking {
   equipmentId String
   startTime   DateTime
   endTime     DateTime
+  /// Why the learner needs the equipment (shown to reviewers and on the calendar).
+  purpose     String?       @db.Text
   status      BookingStatus @default(PENDING)
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt

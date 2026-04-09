@@ -1,13 +1,21 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { auth } from "@/auth";
+import { BOOKING_PURPOSE_MAX_LEN } from "@/lib/booking-purpose";
+import { bookingStartIsInThePast } from "@/lib/booking-time";
 import { canBookFacility } from "@/lib/lab-permissions";
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 
 const createBookingSchema = z.object({
   labId: z.string().min(1),
   startTime: z.coerce.date(),
   endTime: z.coerce.date(),
+  purpose: z
+    .string()
+    .trim()
+    .min(1, "purpose is required")
+    .max(BOOKING_PURPOSE_MAX_LEN),
 });
 
 export async function GET() {
@@ -16,13 +24,8 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const where =
-    session.user.role === "ADMIN" || session.user.role === "INSTRUCTOR"
-      ? {}
-      : { userId: session.user.id };
-
   const bookings = await prisma.labBooking.findMany({
-    where,
+    where: {},
     orderBy: { startTime: "asc" },
     include: {
       lab: { select: { id: true, name: true } },
@@ -56,34 +59,53 @@ export async function POST(req: Request) {
     );
   }
 
+  if (bookingStartIsInThePast(payload.data.startTime)) {
+    return NextResponse.json(
+      { error: "startTime must be in the future" },
+      { status: 400 },
+    );
+  }
+
   const lab = await prisma.lab.findUnique({ where: { id: payload.data.labId } });
   if (!lab) {
     return NextResponse.json({ error: "Lab not found" }, { status: 404 });
   }
 
-  const overlap = await prisma.labBooking.findFirst({
-    where: {
-      labId: payload.data.labId,
-      status: { in: ["PENDING", "APPROVED"] },
-      startTime: { lt: payload.data.endTime },
-      endTime: { gt: payload.data.startTime },
+  const result = await prisma.$transaction(
+    async (tx) => {
+      const overlap = await tx.labBooking.findFirst({
+        where: {
+          labId: payload.data.labId,
+          status: { in: ["PENDING", "APPROVED"] },
+          startTime: { lt: payload.data.endTime },
+          endTime: { gt: payload.data.startTime },
+        },
+      });
+      if (overlap) return { overlap: true as const, booking: null };
+      const booking = await tx.labBooking.create({
+        data: {
+          userId: session.user.id,
+          labId: payload.data.labId,
+          startTime: payload.data.startTime,
+          endTime: payload.data.endTime,
+          purpose: payload.data.purpose,
+          status: "PENDING",
+        },
+      });
+      return { overlap: false as const, booking };
     },
-  });
-  if (overlap) {
+    {
+      isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
+      maxWait: 5000,
+      timeout: 10000,
+    },
+  );
+
+  if (result.overlap) {
     return NextResponse.json(
       { error: "Selected time overlaps with an existing booking" },
       { status: 409 },
     );
   }
-
-  const booking = await prisma.labBooking.create({
-    data: {
-      userId: session.user.id,
-      labId: payload.data.labId,
-      startTime: payload.data.startTime,
-      endTime: payload.data.endTime,
-      status: "PENDING",
-    },
-  });
-  return NextResponse.json({ booking }, { status: 201 });
+  return NextResponse.json({ booking: result.booking }, { status: 201 });
 }

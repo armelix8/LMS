@@ -11,6 +11,8 @@ import {
   validateEquipmentFeaturedImage,
   validateLabFeaturedImage,
 } from "@/lib/image-upload";
+import { requireBookingPurposeFromFormData } from "@/lib/booking-purpose";
+import { bookingStartIsInThePast } from "@/lib/booking-time";
 import {
   canBookFacility,
   canManageBookings,
@@ -19,6 +21,7 @@ import {
   canManageMaintenance,
 } from "@/lib/lab-permissions";
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 
 async function requireUser() {
   const session = await auth();
@@ -324,12 +327,16 @@ export async function createBookingAction(formData: FormData): Promise<void> {
   const labId = String(formData.get("labId") ?? "").trim();
   const startTimeRaw = String(formData.get("startTime") ?? "").trim();
   const endTimeRaw = String(formData.get("endTime") ?? "").trim();
-  if (!labId || !startTimeRaw || !endTimeRaw) return;
+  const purpose = requireBookingPurposeFromFormData(formData);
+  if (!labId || !startTimeRaw || !endTimeRaw || !purpose) return;
 
   const startTime = new Date(startTimeRaw);
   const endTime = new Date(endTimeRaw);
   if (Number.isNaN(startTime.getTime()) || Number.isNaN(endTime.getTime())) return;
   if (endTime <= startTime) return;
+  if (bookingStartIsInThePast(startTime)) {
+    redirect("/labs/bookings?error=past_time&add=lab");
+  }
 
   const lab = await prisma.lab.findUnique({
     where: { id: labId },
@@ -337,25 +344,40 @@ export async function createBookingAction(formData: FormData): Promise<void> {
   });
   if (!lab) return;
 
-  const overlap = await prisma.labBooking.findFirst({
-    where: {
-      labId,
-      status: { in: ["PENDING", "APPROVED"] },
-      startTime: { lt: endTime },
-      endTime: { gt: startTime },
+  const result = await prisma.$transaction(
+    async (tx) => {
+      const overlap = await tx.labBooking.findFirst({
+        where: {
+          labId,
+          status: { in: ["PENDING", "APPROVED"] },
+          startTime: { lt: endTime },
+          endTime: { gt: startTime },
+        },
+      });
+      if (overlap) return { overlap: true as const };
+      await tx.labBooking.create({
+        data: {
+          userId: user.id,
+          labId,
+          startTime,
+          endTime,
+          purpose,
+          status: "PENDING",
+        },
+      });
+      return { overlap: false as const };
     },
-  });
-  if (overlap) return;
+    {
+      isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
+      maxWait: 5000,
+      timeout: 10000,
+    },
+  );
 
-  await prisma.labBooking.create({
-    data: {
-      userId: user.id,
-      labId,
-      startTime,
-      endTime,
-      status: "PENDING",
-    },
-  });
+  if (result.overlap) {
+    redirect("/labs/bookings?error=lab_overlap&add=lab");
+  }
+
   revalidatePath("/labs/bookings");
 }
 
@@ -369,12 +391,23 @@ export async function createEquipmentBookingAction(
 
   const startTimeRaw = String(formData.get("startTime") ?? "").trim();
   const endTimeRaw = String(formData.get("endTime") ?? "").trim();
-  if (!startTimeRaw || !endTimeRaw) return;
+  const purpose = requireBookingPurposeFromFormData(formData);
+  if (!startTimeRaw || !endTimeRaw || !purpose) return;
+
+  const fromEquipmentDetail = String(
+    formData.get("fromEquipmentDetail") ?? "",
+  ).trim();
 
   const startTime = new Date(startTimeRaw);
   const endTime = new Date(endTimeRaw);
   if (Number.isNaN(startTime.getTime()) || Number.isNaN(endTime.getTime())) return;
   if (endTime <= startTime) return;
+  if (bookingStartIsInThePast(startTime)) {
+    if (fromEquipmentDetail === equipmentId) {
+      redirect(`/labs/equipment/${equipmentId}?error=past`);
+    }
+    redirect("/labs/bookings?error=past_time&add=equipment");
+  }
 
   const equipment = await prisma.equipment.findUnique({
     where: { id: equipmentId },
@@ -383,25 +416,43 @@ export async function createEquipmentBookingAction(
   if (!equipment) return;
   if (equipment.status === "BROKEN") return;
 
-  const overlap = await prisma.equipmentBooking.findFirst({
-    where: {
-      equipmentId,
-      status: { in: ["PENDING", "APPROVED"] },
-      startTime: { lt: endTime },
-      endTime: { gt: startTime },
+  const result = await prisma.$transaction(
+    async (tx) => {
+      const overlap = await tx.equipmentBooking.findFirst({
+        where: {
+          equipmentId,
+          status: { in: ["PENDING", "APPROVED"] },
+          startTime: { lt: endTime },
+          endTime: { gt: startTime },
+        },
+      });
+      if (overlap) return { overlap: true as const };
+      await tx.equipmentBooking.create({
+        data: {
+          userId: user.id,
+          equipmentId,
+          startTime,
+          endTime,
+          purpose,
+          status: "PENDING",
+        },
+      });
+      return { overlap: false as const };
     },
-  });
-  if (overlap) return;
+    {
+      isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
+      maxWait: 5000,
+      timeout: 10000,
+    },
+  );
 
-  await prisma.equipmentBooking.create({
-    data: {
-      userId: user.id,
-      equipmentId,
-      startTime,
-      endTime,
-      status: "PENDING",
-    },
-  });
+  if (result.overlap) {
+    if (fromEquipmentDetail === equipmentId) {
+      redirect(`/labs/equipment/${equipmentId}?error=overlap`);
+    }
+    redirect("/labs/bookings?error=equipment_overlap&add=equipment");
+  }
+
   revalidatePath(`/labs/equipment/${equipmentId}`);
   revalidatePath("/labs/bookings");
 }
