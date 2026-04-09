@@ -10,16 +10,6 @@ const updateLabSchema = z.object({
   featuredImageUrl: z.string().url().max(2000).optional().nullable(),
   location: z.string().min(1).max(300).optional(),
   capacity: z.coerce.number().int().min(1).max(10000).optional(),
-  labType: z
-    .enum([
-      "ELECTRONICS",
-      "WOODWORKING",
-      "THREE_D_PRINTING",
-      "CNC",
-      "LASER",
-      "GENERAL",
-    ])
-    .optional(),
   status: z.enum(["ACTIVE", "MAINTENANCE", "CLOSED"]).optional(),
 });
 

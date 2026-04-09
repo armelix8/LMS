@@ -10,14 +10,6 @@ const createLabSchema = z.object({
   featuredImageUrl: z.string().url().max(2000).optional().nullable(),
   location: z.string().min(1).max(300),
   capacity: z.coerce.number().int().min(1).max(10000),
-  labType: z.enum([
-    "ELECTRONICS",
-    "WOODWORKING",
-    "THREE_D_PRINTING",
-    "CNC",
-    "LASER",
-    "GENERAL",
-  ]),
   status: z.enum(["ACTIVE", "MAINTENANCE", "CLOSED"]).optional(),
 });
 
@@ -55,7 +47,6 @@ export async function POST(req: Request) {
       featuredImageUrl: payload.data.featuredImageUrl ?? null,
       location: payload.data.location,
       capacity: payload.data.capacity,
-      labType: payload.data.labType,
       status: payload.data.status ?? "ACTIVE",
     },
   });

@@ -1,15 +1,19 @@
 import Link from "next/link";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { auth } from "@/auth";
+import { LabGuestSignInPrompt } from "@/components/lab-guest-sign-in-prompt";
 import {
   formatBookingStatus,
   formatEquipmentStatus,
   formatLabStatus,
-  formatLabType,
   formatMaintenanceStatus,
   statusBadgeClass,
 } from "@/lib/lab-display";
-import { canManageLabs } from "@/lib/lab-permissions";
+import {
+  canBookFacility,
+  canManageEquipment,
+  canManageLabs,
+} from "@/lib/lab-permissions";
 import { prisma } from "@/lib/prisma";
 
 type Props = {
@@ -45,7 +49,7 @@ function hourLabel(h: number): string {
 
 export default async function LabDetailPage({ params, searchParams }: Props) {
   const session = await auth();
-  if (!session?.user?.id) redirect("/auth/signin?callbackUrl=/labs");
+  const isGuest = !session?.user;
 
   const { id } = await params;
   const sp = await searchParams;
@@ -72,28 +76,49 @@ export default async function LabDetailPage({ params, searchParams }: Props) {
   const end = new Date(start);
   end.setDate(end.getDate() + 7);
 
-  const [bookings, maintenanceLogs] = await Promise.all([
-    prisma.labBooking.findMany({
-      where: {
-        labId: lab.id,
-        startTime: { gte: start, lt: end },
-      },
-      orderBy: { startTime: "asc" },
-      include: {
-        user: { select: { name: true, email: true } },
-      },
-    }),
-    prisma.maintenanceLog.findMany({
-      where: { equipment: { labId: lab.id } },
-      orderBy: { createdAt: "desc" },
-      include: {
-        equipment: { select: { name: true } },
-        reportedBy: { select: { name: true, email: true } },
-      },
-    }),
-  ]);
+  const bookingWhere = {
+    labId: lab.id,
+    startTime: { gte: start, lt: end },
+  } as const;
 
-  const canManage = canManageLabs(session.user.role);
+  const guestWeekBookings = isGuest
+    ? await prisma.labBooking.findMany({
+        where: bookingWhere,
+        orderBy: { startTime: "asc" },
+        select: {
+          id: true,
+          startTime: true,
+          endTime: true,
+          status: true,
+        },
+      })
+    : [];
+
+  const memberWeekBookings = !isGuest
+    ? await prisma.labBooking.findMany({
+        where: bookingWhere,
+        orderBy: { startTime: "asc" },
+        include: {
+          user: { select: { name: true, email: true } },
+        },
+      })
+    : [];
+
+  const maintenanceLogs = isGuest
+    ? []
+    : await prisma.maintenanceLog.findMany({
+        where: { equipment: { labId: lab.id } },
+        orderBy: { createdAt: "desc" },
+        include: {
+          equipment: { select: { name: true } },
+          reportedBy: { select: { name: true, email: true } },
+        },
+      });
+
+  const role = session?.user?.role;
+  const canManage = !!role && canManageLabs(role);
+  const canAddEquipment = !!role && canManageEquipment(role);
+  const canAddBooking = !!role && canBookFacility(role);
   const days = Array.from({ length: 7 }, (_, i) => {
     const d = new Date(start);
     d.setDate(start.getDate() + i);
@@ -154,12 +179,6 @@ export default async function LabDetailPage({ params, searchParams }: Props) {
           </h2>
           <dl className="mt-3 space-y-2 text-sm">
             <div className="flex items-center justify-between gap-3">
-              <dt className="text-slate-500 dark:text-slate-400">Type</dt>
-              <dd className="font-medium text-slate-800 dark:text-slate-200">
-                {formatLabType(lab.labType)}
-              </dd>
-            </div>
-            <div className="flex items-center justify-between gap-3">
               <dt className="text-slate-500 dark:text-slate-400">Capacity</dt>
               <dd className="font-medium text-slate-800 dark:text-slate-200">
                 {lab.capacity}
@@ -215,12 +234,14 @@ export default async function LabDetailPage({ params, searchParams }: Props) {
               <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
                 Equipment in Lab
               </h3>
-              <Link
-                href="/labs/equipment"
-                className="text-sm font-medium text-sky-700 hover:underline dark:text-sky-300"
-              >
-                + Add Equipment
-              </Link>
+              {canAddEquipment ? (
+                <Link
+                  href="/labs/equipment"
+                  className="text-sm font-medium text-sky-700 hover:underline dark:text-sky-300"
+                >
+                  + Add Equipment
+                </Link>
+              ) : null}
             </div>
             <ul className="mt-3 space-y-2">
               {lab.equipment.slice(0, 6).map((item) => (
@@ -256,12 +277,14 @@ export default async function LabDetailPage({ params, searchParams }: Props) {
               <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
                 Booking Calendar
               </h3>
-              <Link
-                href="/labs/bookings"
-                className="text-sm font-medium text-sky-700 hover:underline dark:text-sky-300"
-              >
-                + Add Booking
-              </Link>
+              {canAddBooking ? (
+                <Link
+                  href="/labs/bookings"
+                  className="text-sm font-medium text-sky-700 hover:underline dark:text-sky-300"
+                >
+                  + Add Booking
+                </Link>
+              ) : null}
             </div>
             <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
               <p className="text-xs text-slate-500 dark:text-slate-400">
@@ -286,7 +309,7 @@ export default async function LabDetailPage({ params, searchParams }: Props) {
             <div className="mt-2 flex items-center gap-4 text-xs">
               <span className="inline-flex items-center gap-1 text-rose-700 dark:text-rose-300">
                 <span className="h-2.5 w-2.5 rounded-full bg-rose-500" />
-                Booked
+                {isGuest ? "Reserved" : "Booked"}
               </span>
               <span className="inline-flex items-center gap-1 text-emerald-700 dark:text-emerald-300">
                 <span className="h-2.5 w-2.5 rounded-full bg-emerald-500" />
@@ -321,10 +344,22 @@ export default async function LabDetailPage({ params, searchParams }: Props) {
                         slotStart.setHours(h, 0, 0, 0);
                         const slotEnd = new Date(slotStart);
                         slotEnd.setHours(slotStart.getHours() + 1);
-                        const cellItems = bookings.filter(
-                          (b) => b.startTime < slotEnd && b.endTime > slotStart,
-                        );
-                        const isBooked = cellItems.length > 0;
+                        const cellGuest = isGuest
+                          ? guestWeekBookings.filter(
+                              (b) =>
+                                b.startTime < slotEnd && b.endTime > slotStart,
+                            )
+                          : [];
+                        const cellMember = !isGuest
+                          ? memberWeekBookings.filter(
+                              (b) =>
+                                b.startTime < slotEnd && b.endTime > slotStart,
+                            )
+                          : [];
+                        const isBooked = isGuest
+                          ? cellGuest.length > 0
+                          : cellMember.length > 0;
+                        const firstMember = cellMember[0];
                         return (
                           <td
                             key={`${h}-${d.toISOString()}`}
@@ -336,37 +371,37 @@ export default async function LabDetailPage({ params, searchParams }: Props) {
                           >
                             {isBooked ? (
                               <span className="inline-flex rounded bg-rose-600 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
-                                Booked
+                                {isGuest ? "Reserved" : "Booked"}
                               </span>
                             ) : (
                               <span className="inline-flex rounded bg-emerald-100 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300">
                                 Free
                               </span>
                             )}
-                            {isBooked ? (
+                            {firstMember ? (
                               <div className="mt-1 rounded bg-white/90 p-1 text-[10px] text-slate-900 dark:bg-slate-900/70 dark:text-slate-100">
                                 <p className="font-semibold">
-                                  {cellItems[0].user.name ?? cellItems[0].user.email}
+                                  {firstMember.user.name ?? firstMember.user.email}
                                 </p>
                                 <p>
-                                  {cellItems[0].startTime.toLocaleTimeString([], {
+                                  {firstMember.startTime.toLocaleTimeString([], {
                                     hour: "2-digit",
                                     minute: "2-digit",
                                   })}{" "}
                                   -{" "}
-                                  {cellItems[0].endTime.toLocaleTimeString([], {
+                                  {firstMember.endTime.toLocaleTimeString([], {
                                     hour: "2-digit",
                                     minute: "2-digit",
                                   })}
                                 </p>
-                                {cellItems[0].purpose ? (
+                                {firstMember.purpose ? (
                                   <p className="mt-0.5 line-clamp-2 text-[9px] text-slate-600 dark:text-slate-400">
-                                    {cellItems[0].purpose}
+                                    {firstMember.purpose}
                                   </p>
                                 ) : null}
-                                {cellItems.length > 1 ? (
+                                {cellMember.length > 1 ? (
                                   <p className="mt-0.5 text-[9px]">
-                                    +{cellItems.length - 1} more
+                                    +{cellMember.length - 1} more
                                   </p>
                                 ) : null}
                               </div>
@@ -419,101 +454,117 @@ export default async function LabDetailPage({ params, searchParams }: Props) {
       ) : null}
 
       {activeTab === "bookings" ? (
-        <section className="mt-5 rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900/50">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
-              Bookings this week
-            </h3>
-            <div className="flex items-center gap-2 text-xs">
-              <Link
-                href={`/labs/${lab.id}?tab=bookings&week=${previousWeek.toISOString()}`}
-                className="rounded-md border border-slate-300 px-2 py-1 font-semibold text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
-              >
-                Previous
-              </Link>
-              <Link
-                href={`/labs/${lab.id}?tab=bookings&week=${nextWeek.toISOString()}`}
-                className="rounded-md border border-slate-300 px-2 py-1 font-semibold text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
-              >
-                Next
-              </Link>
+        isGuest ? (
+          <LabGuestSignInPrompt
+            title="Sign in to view booking details"
+            body="See who booked this lab, request your own time slots, and manage reservations from your account."
+            callbackPath={`/labs/${lab.id}?tab=bookings`}
+          />
+        ) : (
+          <section className="mt-5 rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900/50">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
+                Bookings this week
+              </h3>
+              <div className="flex items-center gap-2 text-xs">
+                <Link
+                  href={`/labs/${lab.id}?tab=bookings&week=${previousWeek.toISOString()}`}
+                  className="rounded-md border border-slate-300 px-2 py-1 font-semibold text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
+                >
+                  Previous
+                </Link>
+                <Link
+                  href={`/labs/${lab.id}?tab=bookings&week=${nextWeek.toISOString()}`}
+                  className="rounded-md border border-slate-300 px-2 py-1 font-semibold text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
+                >
+                  Next
+                </Link>
+              </div>
             </div>
-          </div>
-          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-            Week of {start.toLocaleDateString()} -{" "}
-            {new Date(end.getTime() - 86400000).toLocaleDateString()}
-          </p>
-          <ul className="mt-3 space-y-2">
-            {bookings.map((b) => (
-              <li
-                key={b.id}
-                className="rounded-lg border border-slate-200 px-3 py-2 text-sm dark:border-slate-700"
-              >
-                <p className="font-medium text-slate-900 dark:text-slate-100">
-                  {lab.name}
-                </p>
-                <p className="text-slate-600 dark:text-slate-400">
-                  {b.startTime.toLocaleString()} - {b.endTime.toLocaleString()}
-                </p>
-                {b.purpose ? (
-                  <p className="mt-2 whitespace-pre-wrap text-xs text-slate-700 dark:text-slate-300">
-                    <span className="font-medium text-slate-500 dark:text-slate-400">
-                      Why:{" "}
-                    </span>
-                    {b.purpose}
+            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+              Week of {start.toLocaleDateString()} -{" "}
+              {new Date(end.getTime() - 86400000).toLocaleDateString()}
+            </p>
+            <ul className="mt-3 space-y-2">
+              {memberWeekBookings.map((b) => (
+                <li
+                  key={b.id}
+                  className="rounded-lg border border-slate-200 px-3 py-2 text-sm dark:border-slate-700"
+                >
+                  <p className="font-medium text-slate-900 dark:text-slate-100">
+                    {lab.name}
                   </p>
-                ) : null}
-                <p className="mt-1">
-                  <span
-                    className={`rounded-md px-2 py-0.5 text-xs font-semibold ${statusBadgeClass(b.status)}`}
-                  >
-                    {formatBookingStatus(b.status)}
-                  </span>
-                </p>
-              </li>
-            ))}
-            {bookings.length === 0 ? (
-              <li className="text-sm text-slate-500 dark:text-slate-400">
-                No bookings for this week.
-              </li>
-            ) : null}
-          </ul>
-        </section>
+                  <p className="text-slate-600 dark:text-slate-400">
+                    {b.startTime.toLocaleString()} - {b.endTime.toLocaleString()}
+                  </p>
+                  {b.purpose ? (
+                    <p className="mt-2 whitespace-pre-wrap text-xs text-slate-700 dark:text-slate-300">
+                      <span className="font-medium text-slate-500 dark:text-slate-400">
+                        Why:{" "}
+                      </span>
+                      {b.purpose}
+                    </p>
+                  ) : null}
+                  <p className="mt-1">
+                    <span
+                      className={`rounded-md px-2 py-0.5 text-xs font-semibold ${statusBadgeClass(b.status)}`}
+                    >
+                      {formatBookingStatus(b.status)}
+                    </span>
+                  </p>
+                </li>
+              ))}
+              {memberWeekBookings.length === 0 ? (
+                <li className="text-sm text-slate-500 dark:text-slate-400">
+                  No bookings for this week.
+                </li>
+              ) : null}
+            </ul>
+          </section>
+        )
       ) : null}
 
       {activeTab === "maintenance" ? (
-        <section className="mt-5 rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900/50">
-          <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
-            Maintenance
-          </h3>
-          <ul className="mt-3 space-y-2">
-            {maintenanceLogs.map((m) => (
-              <li
-                key={m.id}
-                className="rounded-lg border border-slate-200 px-3 py-2 text-sm dark:border-slate-700"
-              >
-                <p className="font-medium text-slate-900 dark:text-slate-100">
-                  {m.equipment.name}
-                </p>
-                <p className="text-slate-600 dark:text-slate-400">
-                  {m.issueDescription}
-                </p>
-                <p className="mt-1">
-                  <span
-                    className={`rounded-md px-2 py-0.5 text-xs font-semibold ${statusBadgeClass(m.maintenanceStatus)}`}
-                  >
-                    {formatMaintenanceStatus(m.maintenanceStatus)}
-                  </span>
-                </p>
-              </li>
-            ))}
-            {maintenanceLogs.length === 0 ? (
-              <li className="text-sm text-slate-500 dark:text-slate-400">
-                No maintenance logs for this lab.
-              </li>
-            ) : null}
-          </ul>
-        </section>
+        isGuest ? (
+          <LabGuestSignInPrompt
+            title="Sign in for maintenance details"
+            body="Equipment maintenance history is shared with signed-in students and staff. Create an account or sign in to continue."
+            callbackPath={`/labs/${lab.id}?tab=maintenance`}
+          />
+        ) : (
+          <section className="mt-5 rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900/50">
+            <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
+              Maintenance
+            </h3>
+            <ul className="mt-3 space-y-2">
+              {maintenanceLogs.map((m) => (
+                <li
+                  key={m.id}
+                  className="rounded-lg border border-slate-200 px-3 py-2 text-sm dark:border-slate-700"
+                >
+                  <p className="font-medium text-slate-900 dark:text-slate-100">
+                    {m.equipment.name}
+                  </p>
+                  <p className="text-slate-600 dark:text-slate-400">
+                    {m.issueDescription}
+                  </p>
+                  <p className="mt-1">
+                    <span
+                      className={`rounded-md px-2 py-0.5 text-xs font-semibold ${statusBadgeClass(m.maintenanceStatus)}`}
+                    >
+                      {formatMaintenanceStatus(m.maintenanceStatus)}
+                    </span>
+                  </p>
+                </li>
+              ))}
+              {maintenanceLogs.length === 0 ? (
+                <li className="text-sm text-slate-500 dark:text-slate-400">
+                  No maintenance logs for this lab.
+                </li>
+              ) : null}
+            </ul>
+          </section>
+        )
       ) : null}
     </main>
   );

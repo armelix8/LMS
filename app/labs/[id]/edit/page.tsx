@@ -92,7 +92,7 @@ export default async function EditLabPage({ params }: Props) {
             />
           </label>
 
-          <div className="grid gap-4 sm:grid-cols-3">
+          <div className="grid gap-4 sm:grid-cols-2">
             <label className="block text-sm">
               Capacity
               <input
@@ -103,17 +103,6 @@ export default async function EditLabPage({ params }: Props) {
                 defaultValue={lab.capacity}
                 className={inputClass}
               />
-            </label>
-            <label className="block text-sm">
-              Lab type
-              <select name="labType" defaultValue={lab.labType} className={inputClass}>
-                <option value="GENERAL">General</option>
-                <option value="ELECTRONICS">Electronics</option>
-                <option value="WOODWORKING">Woodworking</option>
-                <option value="THREE_D_PRINTING">3D Printing</option>
-                <option value="CNC">CNC</option>
-                <option value="LASER">Laser</option>
-              </select>
             </label>
             <label className="block text-sm">
               Status

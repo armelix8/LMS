@@ -1304,7 +1304,6 @@ Files must be legible. Instructor approval is required before this lesson can be
           "Demo lab space for fabrication workflows, prototyping, and safety training.",
         location: demoLabLocation,
         capacity: 30,
-        labType: "THREE_D_PRINTING",
         status: "ACTIVE",
       },
     });

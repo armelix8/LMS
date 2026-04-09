@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { auth } from "@/auth";
 import { BOOKING_PURPOSE_MAX_LEN } from "@/lib/booking-purpose";
+import { bookingCalendarTimeRangeWhere } from "@/lib/booking-query-window";
 import { bookingStartIsInThePast } from "@/lib/booking-time";
 import { canBookFacility } from "@/lib/lab-permissions";
 import { prisma } from "@/lib/prisma";
@@ -25,9 +26,18 @@ export async function GET() {
   }
 
   const bookings = await prisma.labBooking.findMany({
-    where: {},
+    where: bookingCalendarTimeRangeWhere(),
     orderBy: { startTime: "asc" },
-    include: {
+    select: {
+      id: true,
+      labId: true,
+      userId: true,
+      startTime: true,
+      endTime: true,
+      purpose: true,
+      status: true,
+      createdAt: true,
+      updatedAt: true,
       lab: { select: { id: true, name: true } },
       user: { select: { id: true, name: true, email: true } },
     },

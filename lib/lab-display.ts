@@ -3,26 +3,8 @@ import type {
   EquipmentStatus,
   FacilityAvailabilityStatus,
   LabStatus,
-  LabType,
   MaintenanceStatus,
 } from "@prisma/client";
-
-export function formatLabType(t: LabType): string {
-  switch (t) {
-    case "THREE_D_PRINTING":
-      return "3D Printing";
-    case "WOODWORKING":
-      return "Woodworking";
-    case "ELECTRONICS":
-      return "Electronics";
-    case "CNC":
-      return "CNC";
-    case "LASER":
-      return "Laser";
-    default:
-      return "General";
-  }
-}
 
 export function formatLabStatus(status: LabStatus): string {
   switch (status) {

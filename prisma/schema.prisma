@@ -53,15 +53,6 @@ enum NotificationType {
   ASSIGNMENT_REVIEWED
 }
 
-enum LabType {
-  ELECTRONICS
-  WOODWORKING
-  THREE_D_PRINTING
-  CNC
-  LASER
-  GENERAL
-}
-
 enum LabStatus {
   ACTIVE
   MAINTENANCE
@@ -478,7 +469,6 @@ model Lab {
   featuredImageUrl String?
   location    String
   capacity    Int
-  labType     LabType
   status      LabStatus @default(ACTIVE)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
@@ -543,6 +533,10 @@ model LabBooking {
 
   @@index([labId, startTime, endTime])
   @@index([userId, status])
+  /// List/calendar `orderBy: startTime` and time-window filters.
+  @@index([startTime])
+  /// Overlap checks: lab + status + start range.
+  @@index([labId, status, startTime])
 }
 
 model EquipmentBooking {
@@ -562,6 +556,8 @@ model EquipmentBooking {
 
   @@index([equipmentId, startTime, endTime])
   @@index([userId, status])
+  @@index([startTime])
+  @@index([equipmentId, status, startTime])
 }
 
 model MaintenanceLog {

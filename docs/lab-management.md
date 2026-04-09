@@ -21,7 +21,7 @@ This module introduces laboratory and facilities management with role-based acce
 
 Added entities and enums in `prisma/schema.prisma`:
 
-- Enums: `LabType`, `LabStatus`, `EquipmentStatus`, `FacilityAvailabilityStatus`, `BookingStatus`, `MaintenanceStatus`
+- Enums: `LabStatus`, `EquipmentStatus`, `FacilityAvailabilityStatus`, `BookingStatus`, `MaintenanceStatus`
 - Models: `Lab`, `Equipment`, `Facility`, `LabBooking`, `EquipmentBooking`, `MaintenanceLog`
 - Role enum now includes `LAB_TECHNICIAN`
 

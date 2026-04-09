@@ -10,6 +10,7 @@ import {
   type CalendarBookingEvent,
 } from "@/components/booking-calendar-grid";
 import { BOOKING_PURPOSE_MAX_LEN } from "@/lib/booking-purpose";
+import { bookingCalendarTimeRangeWhere } from "@/lib/booking-query-window";
 import { prisma } from "@/lib/prisma";
 
 const inputClass =
@@ -49,27 +50,54 @@ export default async function BookingCalendarPage({ searchParams }: Props) {
       ? ("equipment" as const)
       : ("lab" as const);
 
+  const bookingWindow = bookingCalendarTimeRangeWhere();
+
   const [labs, equipment, bookings, equipmentBookings] = await Promise.all([
     prisma.lab.findMany({
       where: { status: { in: ["ACTIVE", "MAINTENANCE"] } },
       orderBy: { name: "asc" },
+      select: {
+        id: true,
+        name: true,
+      },
     }),
     prisma.equipment.findMany({
       where: { status: { in: ["AVAILABLE", "IN_USE"] } },
       orderBy: { name: "asc" },
-      include: { lab: { select: { name: true } } },
+      select: {
+        id: true,
+        name: true,
+        lab: { select: { name: true } },
+      },
     }),
     prisma.labBooking.findMany({
+      where: bookingWindow,
       orderBy: { startTime: "asc" },
-      include: {
+      select: {
+        id: true,
+        purpose: true,
+        status: true,
+        startTime: true,
+        endTime: true,
         lab: { select: { name: true } },
         user: { select: { name: true, email: true } },
       },
     }),
     prisma.equipmentBooking.findMany({
+      where: bookingWindow,
       orderBy: { startTime: "asc" },
-      include: {
-        equipment: { include: { lab: { select: { name: true } } } },
+      select: {
+        id: true,
+        purpose: true,
+        status: true,
+        startTime: true,
+        endTime: true,
+        equipment: {
+          select: {
+            name: true,
+            lab: { select: { name: true } },
+          },
+        },
         user: { select: { name: true, email: true } },
       },
     }),

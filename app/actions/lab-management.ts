@@ -40,7 +40,6 @@ export async function createLabAction(formData: FormData): Promise<void> {
   const featuredImageFile = getFormImageFile(formData, "featuredImageFile");
   const location = String(formData.get("location") ?? "").trim();
   const capacity = Math.max(1, Math.round(Number(formData.get("capacity")) || 1));
-  const labType = String(formData.get("labType") ?? "GENERAL");
   const status = String(formData.get("status") ?? "ACTIVE");
 
   if (!name || !location) return;
@@ -52,14 +51,6 @@ export async function createLabAction(formData: FormData): Promise<void> {
       featuredImageUrl,
       location,
       capacity,
-      labType:
-        labType === "ELECTRONICS" ||
-        labType === "WOODWORKING" ||
-        labType === "THREE_D_PRINTING" ||
-        labType === "CNC" ||
-        labType === "LASER"
-          ? labType
-          : "GENERAL",
       status:
         status === "MAINTENANCE" || status === "CLOSED" ? status : "ACTIVE",
     },
@@ -93,7 +84,6 @@ export async function updateLabAction(
   const featuredImageFile = getFormImageFile(formData, "featuredImageFile");
   const location = String(formData.get("location") ?? "").trim();
   const capacity = Math.max(1, Math.round(Number(formData.get("capacity")) || 1));
-  const labType = String(formData.get("labType") ?? "GENERAL");
   const status = String(formData.get("status") ?? "ACTIVE");
 
   if (!name || !location) return;
@@ -136,14 +126,6 @@ export async function updateLabAction(
       featuredImageUrl: nextFeaturedImageUrl,
       location,
       capacity,
-      labType:
-        labType === "ELECTRONICS" ||
-        labType === "WOODWORKING" ||
-        labType === "THREE_D_PRINTING" ||
-        labType === "CNC" ||
-        labType === "LASER"
-          ? labType
-          : "GENERAL",
       status:
         status === "MAINTENANCE" || status === "CLOSED" ? status : "ACTIVE",
     },
