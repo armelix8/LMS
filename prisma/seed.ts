@@ -1291,22 +1291,141 @@ Files must be legible. Instructor approval is required before this lesson can be
     });
   }
 
-  const demoLabName = "UNIPOD Digital Fabrication Lab";
-  const demoLabLocation = "UNIPOD Campus - Building A";
-  let demoLab = await prisma.lab.findFirst({
-    where: { name: demoLabName, location: demoLabLocation },
-  });
-  if (!demoLab) {
-    demoLab = await prisma.lab.create({
-      data: {
-        name: demoLabName,
-        description:
-          "Demo lab space for fabrication workflows, prototyping, and safety training.",
-        location: demoLabLocation,
-        capacity: 30,
-        status: "ACTIVE",
-      },
+  /**
+   * Matches https://unipod.ur.ac.rw/destination-list/
+   * Hero photos were downloaded from the same URLs referenced on that page (WP media)
+   * and stored under public/labs/unipod/ for stable local serving.
+   */
+  const UNIPOD_LAB_LOCATION =
+    "UR UNIPOD, College of Science and Technology, University of Rwanda";
+
+  const unipodDestinationLabs = [
+    {
+      name: "Pitching room",
+      capacity: 24,
+      featuredImageUrl: "/labs/unipod/pitching-room.jpg",
+      description:
+        "A dynamic space for pitching, innovation showcases, and collaboration within the maker space.",
+    },
+    {
+      name: "Design Lab",
+      capacity: 40,
+      featuredImageUrl: "/labs/unipod/design-lab.jpg",
+      description:
+        "Creativity meets cutting-edge technology: high-performance workstations and software for design and digital modeling.",
+    },
+    {
+      name: "Green-tech Lab",
+      capacity: 20,
+      featuredImageUrl: "/labs/unipod/green-tech-lab.jpg",
+      description:
+        "Dedicated to sustainable technology and eco-conscious innovation as part of the maker space.",
+    },
+    {
+      name: "Agritech and food tech",
+      capacity: 20,
+      featuredImageUrl: "/labs/unipod/agritech-food-tech.jpg",
+      description:
+        "Explore agriculture, food systems, and related technologies in a hands-on lab environment.",
+    },
+    {
+      name: "Audio - visual Studio lab",
+      capacity: 16,
+      featuredImageUrl: "/labs/unipod/audio-visual-studio.jpg",
+      description:
+        "Multimedia production with professional audio and visual equipment for creative projects.",
+    },
+    {
+      name: "Wood Workshop",
+      capacity: 15,
+      featuredImageUrl: "/labs/unipod/wood-workshop.jpg",
+      description:
+        "Woodworking tools and resources for projects from small crafts to larger builds, with safety-first workflows.",
+    },
+    {
+      name: "Electrical and Electronics Lab",
+      capacity: 24,
+      featuredImageUrl: "/labs/unipod/electrical-electronics.jpg",
+      description:
+        "Circuits, electronics, and experimentation—where ideas are prototyped and tested on the bench.",
+    },
+    {
+      name: "Mechanical Workshop",
+      capacity: 16,
+      featuredImageUrl: "/labs/unipod/mechanical-workshop.jpg",
+      description:
+        "Machinery and tooling for mechanical builds, fabrication support, and product development.",
+    },
+    {
+      name: "VR / Gaming",
+      capacity: 12,
+      featuredImageUrl: "/labs/unipod/vr-gaming.jpg",
+      description:
+        "Virtual reality and gaming technologies for immersive experiences, prototyping, and research.",
+    },
+    {
+      name: "Rapid Prototyping",
+      capacity: 25,
+      featuredImageUrl: "/labs/unipod/rapid-prototyping.jpg",
+      description:
+        "Bring concepts to physical form quickly—3D printing, laser cutting, and related rapid-fabrication workflows.",
+    },
+    {
+      name: "Textile lab",
+      capacity: 15,
+      featuredImageUrl: "/labs/unipod/textile-lab.jpg",
+      description:
+        "Where textiles meet technology: experimentation with materials, digital tools, and wearable concepts.",
+    },
+    {
+      name: "Unipod Cafe",
+      capacity: 35,
+      featuredImageUrl: "/labs/unipod/unipod-cafe.jpg",
+      description:
+        "Community hub for informal collaboration, breaks, and connection between makers and visitors.",
+    },
+  ] as const;
+
+  for (const def of unipodDestinationLabs) {
+    const existing = await prisma.lab.findFirst({
+      where: { name: def.name, location: UNIPOD_LAB_LOCATION },
     });
+    const data = {
+      name: def.name,
+      description: def.description,
+      location: UNIPOD_LAB_LOCATION,
+      capacity: def.capacity,
+      status: "ACTIVE" as const,
+      featuredImageUrl: def.featuredImageUrl,
+    };
+    if (!existing) {
+      await prisma.lab.create({ data });
+    } else {
+      await prisma.lab.update({
+        where: { id: existing.id },
+        data: {
+          description: data.description,
+          capacity: data.capacity,
+          featuredImageUrl: data.featuredImageUrl,
+        },
+      });
+    }
+  }
+
+  const demoLab =
+    (await prisma.lab.findFirst({
+      where: { name: "Rapid Prototyping", location: UNIPOD_LAB_LOCATION },
+    })) ??
+    (await prisma.lab.findFirst({
+      where: { name: "Design Lab", location: UNIPOD_LAB_LOCATION },
+    })) ??
+    (await prisma.lab.findFirst({
+      where: { location: UNIPOD_LAB_LOCATION },
+      orderBy: { name: "asc" },
+    }));
+
+  if (!demoLab) {
+    throw new Error("Expected at least one UNIPOD lab after seeding destinations.");
   }
 
   const demoFacilities = [

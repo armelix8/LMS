@@ -103,7 +103,7 @@ export function SiteHeaderNav({
             <NavItem href="/">Home</NavItem>
             <NavItem href="/programs">Programs</NavItem>
             <NavItem href="/courses">Courses</NavItem>
-            <NavItem href="/labs">Labs</NavItem>
+            {user ? <NavItem href="/labs">Labs</NavItem> : null}
             {user ? <NavItem href="/dashboard">Dashboard</NavItem> : null}
           </div>
         </nav>
@@ -233,13 +233,15 @@ export function SiteHeaderNav({
             >
               Courses
             </Link>
-            <Link
-              href="/labs"
-              className="rounded-lg px-3 py-2.5 text-sm font-medium text-slate-900 hover:bg-slate-100 dark:text-slate-100 dark:hover:bg-slate-900"
-              onClick={() => setMobileOpen(false)}
-            >
-              Labs
-            </Link>
+            {user ? (
+              <Link
+                href="/labs"
+                className="rounded-lg px-3 py-2.5 text-sm font-medium text-slate-900 hover:bg-slate-100 dark:text-slate-100 dark:hover:bg-slate-900"
+                onClick={() => setMobileOpen(false)}
+              >
+                Labs
+              </Link>
+            ) : null}
             {user ? (
               <Link
                 href="/dashboard"
