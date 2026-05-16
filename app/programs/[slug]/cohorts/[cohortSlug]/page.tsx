@@ -56,12 +56,13 @@ export default async function LearnerCohortPage({
   });
   if (!cohort) notFound();
 
+  const isAdmin = session.user.role === "ADMIN";
   const member = await prisma.cohortMember.findUnique({
     where: {
       cohortId_userId: { cohortId: cohort.id, userId: session.user.id },
     },
   });
-  if (!member || member.status !== "ACTIVE") {
+  if (!isAdmin && (!member || member.status !== "ACTIVE")) {
     return (
       <main className="flex-1 px-4 py-16 sm:px-6">
         <div className="mx-auto max-w-lg overflow-hidden rounded-3xl border border-slate-200/90 bg-white shadow-[0_22px_50px_-12px_rgba(15,23,42,0.12)] ring-1 ring-slate-900/[0.04] dark:border-slate-800 dark:bg-slate-900/80 dark:ring-white/[0.06]">
@@ -126,9 +127,39 @@ export default async function LearnerCohortPage({
   const subByAssignmentId = new Map(submissions.map((s) => [s.assignmentId, s]));
 
   const programTitle = cohort.program.title;
+  const isAdminViewer = isAdmin && (!member || member.status !== "ACTIVE");
 
   return (
     <main className="flex-1">
+      {isAdmin ? (
+        <div className="border-b border-[var(--brand-500)]/20 bg-gradient-to-r from-[var(--brand-50)] to-[var(--accent-400)]/10 dark:from-[var(--brand-950)] dark:to-transparent">
+          <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
+            <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[var(--brand-700)] dark:text-[var(--brand-300)]">
+              <span
+                aria-hidden
+                className="inline-block h-1.5 w-1.5 rounded-full bg-[var(--accent-400)]"
+              />
+              {isAdminViewer
+                ? "Admin · read-only preview (you are not a cohort member)"
+                : "Admin view"}
+            </p>
+            <div className="flex flex-wrap items-center gap-2">
+              <Link
+                href={`/admin/programs/${cohort.program.id}/cohorts/${cohort.id}`}
+                className="inline-flex items-center gap-1.5 rounded-md bg-[var(--brand-500)] px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:bg-[var(--brand-600)]"
+              >
+                <span aria-hidden>⚙</span> Manage cohort
+              </Link>
+              <Link
+                href={`/admin/programs/${cohort.program.id}`}
+                className="inline-flex items-center rounded-md border border-[var(--border-strong)] bg-[var(--surface)] px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:border-[var(--brand-500)]/40 hover:text-[var(--brand-700)] dark:text-slate-200"
+              >
+                Manage program
+              </Link>
+            </div>
+          </div>
+        </div>
+      ) : null}
       <div className="relative border-b border-teal-900/[0.06] bg-gradient-to-b from-teal-50/60 via-white to-[var(--background)] dark:from-teal-950/25 dark:via-slate-950 dark:to-[var(--background)]">
         <div
           className="pointer-events-none absolute inset-0 overflow-hidden"

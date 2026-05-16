@@ -5,6 +5,12 @@ import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+const inputClass =
+  "mt-1 w-full rounded-lg border border-[var(--border-strong)] bg-[var(--surface)] px-3 py-2 text-slate-900 shadow-sm outline-none transition focus:border-[var(--brand-500)] focus:ring-2 focus:ring-[var(--brand-500)]/30 dark:text-white";
+
+const labelClass =
+  "block text-sm font-medium text-slate-700 dark:text-slate-300";
+
 export function SignUpForm() {
   const router = useRouter();
   const [name, setName] = useState("");
@@ -51,10 +57,7 @@ export function SignUpForm() {
         </p>
       )}
       <div>
-        <label
-          htmlFor="name"
-          className="block text-sm font-medium text-slate-700 dark:text-slate-300"
-        >
+        <label htmlFor="name" className={labelClass}>
           Full name
         </label>
         <input
@@ -64,14 +67,11 @@ export function SignUpForm() {
           required
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 shadow-sm outline-none ring-indigo-500 focus:ring-2 dark:border-slate-600 dark:bg-slate-900 dark:text-white"
+          className={inputClass}
         />
       </div>
       <div>
-        <label
-          htmlFor="email"
-          className="block text-sm font-medium text-slate-700 dark:text-slate-300"
-        >
+        <label htmlFor="email" className={labelClass}>
           Email
         </label>
         <input
@@ -82,14 +82,11 @@ export function SignUpForm() {
           required
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 shadow-sm outline-none ring-indigo-500 focus:ring-2 dark:border-slate-600 dark:bg-slate-900 dark:text-white"
+          className={inputClass}
         />
       </div>
       <div>
-        <label
-          htmlFor="password"
-          className="block text-sm font-medium text-slate-700 dark:text-slate-300"
-        >
+        <label htmlFor="password" className={labelClass}>
           Password (min 8 characters)
         </label>
         <input
@@ -101,21 +98,21 @@ export function SignUpForm() {
           minLength={8}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 shadow-sm outline-none ring-indigo-500 focus:ring-2 dark:border-slate-600 dark:bg-slate-900 dark:text-white"
+          className={inputClass}
         />
       </div>
       <button
         type="submit"
         disabled={pending}
-        className="w-full rounded-xl bg-indigo-600 py-3 text-sm font-semibold text-white transition hover:bg-indigo-500 disabled:opacity-50"
+        className="w-full rounded-xl bg-[var(--brand-500)] py-3 text-sm font-semibold text-white shadow-sm shadow-[var(--brand-900)]/20 transition hover:bg-[var(--brand-600)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent-400)] disabled:opacity-50"
       >
         {pending ? "Creating account…" : "Create account"}
       </button>
-      <p className="text-center text-sm text-slate-600 dark:text-slate-400">
+      <p className="text-center text-sm text-[var(--muted-foreground)]">
         Already have an account?{" "}
         <Link
           href="/auth/signin"
-          className="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400"
+          className="font-semibold text-[var(--brand-700)] hover:text-[var(--brand-600)] dark:text-[var(--brand-300)]"
         >
           Sign in
         </Link>

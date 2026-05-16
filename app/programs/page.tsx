@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { HeroInitialCover } from "@/components/hero-initial-cover";
 
@@ -8,8 +9,11 @@ const inputFocus =
   "focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500/25 dark:focus:ring-sky-400/30";
 
 export default async function ProgramsPage() {
+  const session = await auth();
+  const isAdmin = session?.user?.role === "ADMIN";
+
   const programs = await prisma.program.findMany({
-    where: { published: true },
+    where: isAdmin ? undefined : { published: true },
     orderBy: { title: "asc" },
     include: {
       _count: { select: { phases: true, cohorts: true } },
@@ -18,6 +22,33 @@ export default async function ProgramsPage() {
 
   return (
     <main className="flex-1">
+      {isAdmin ? (
+        <div className="border-b border-[var(--brand-500)]/20 bg-gradient-to-r from-[var(--brand-50)] to-[var(--accent-400)]/10 dark:from-[var(--brand-950)] dark:to-transparent">
+          <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
+            <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[var(--brand-700)] dark:text-[var(--brand-300)]">
+              <span
+                aria-hidden
+                className="inline-block h-1.5 w-1.5 rounded-full bg-[var(--accent-400)]"
+              />
+              Admin · listing includes unpublished programs
+            </p>
+            <div className="flex flex-wrap items-center gap-2">
+              <Link
+                href="/admin/programs/new"
+                className="inline-flex items-center gap-1.5 rounded-md bg-[var(--brand-500)] px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:bg-[var(--brand-600)]"
+              >
+                + New program
+              </Link>
+              <Link
+                href="/admin/programs"
+                className="inline-flex items-center rounded-md border border-[var(--border-strong)] bg-[var(--surface)] px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:border-[var(--brand-500)]/40 hover:text-[var(--brand-700)] dark:text-slate-200"
+              >
+                Manage programs
+              </Link>
+            </div>
+          </div>
+        </div>
+      ) : null}
       <div className="relative border-b border-teal-900/[0.06] bg-gradient-to-b from-teal-50/60 via-white to-[var(--background)] dark:from-teal-950/25 dark:via-slate-950 dark:to-[var(--background)]">
         <div
           className="pointer-events-none absolute inset-0 overflow-hidden"
@@ -88,12 +119,19 @@ export default async function ProgramsPage() {
                     </div>
                   </div>
                   <div className="flex flex-1 flex-col p-6 sm:p-7">
-                    <Link
-                      href={`/programs/${p.slug}`}
-                      className="text-lg font-bold text-slate-900 transition group-hover:text-sky-700 dark:text-white dark:group-hover:text-sky-300"
-                    >
-                      {p.title}
-                    </Link>
+                    <div className="flex items-start justify-between gap-2">
+                      <Link
+                        href={`/programs/${p.slug}`}
+                        className="text-lg font-bold text-slate-900 transition group-hover:text-sky-700 dark:text-white dark:group-hover:text-sky-300"
+                      >
+                        {p.title}
+                      </Link>
+                      {isAdmin && !p.published ? (
+                        <span className="shrink-0 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-amber-900 dark:bg-amber-950/60 dark:text-amber-200">
+                          Draft
+                        </span>
+                      ) : null}
+                    </div>
                     <p className="mt-3 line-clamp-3 flex-1 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
                       {p.description}
                     </p>
@@ -106,15 +144,25 @@ export default async function ProgramsPage() {
                         {p._count.cohorts === 1 ? "" : "s"}
                       </span>
                     </div>
-                    <Link
-                      href={`/programs/${p.slug}`}
-                      className="mt-5 inline-flex items-center text-sm font-semibold text-sky-700 hover:text-sky-600 dark:text-sky-400 dark:hover:text-sky-300"
-                    >
-                      View program
-                      <span className="ml-1 transition group-hover:translate-x-0.5" aria-hidden>
-                        →
-                      </span>
-                    </Link>
+                    <div className="mt-5 flex flex-wrap items-center gap-3">
+                      <Link
+                        href={`/programs/${p.slug}`}
+                        className="inline-flex items-center text-sm font-semibold text-sky-700 hover:text-sky-600 dark:text-sky-400 dark:hover:text-sky-300"
+                      >
+                        View program
+                        <span className="ml-1 transition group-hover:translate-x-0.5" aria-hidden>
+                          →
+                        </span>
+                      </Link>
+                      {isAdmin ? (
+                        <Link
+                          href={`/admin/programs/${p.id}`}
+                          className="inline-flex items-center gap-1 text-xs font-semibold text-[var(--brand-700)] underline-offset-4 hover:underline dark:text-[var(--brand-300)]"
+                        >
+                          <span aria-hidden>⚙</span> Manage
+                        </Link>
+                      ) : null}
+                    </div>
                   </div>
                 </article>
               </li>

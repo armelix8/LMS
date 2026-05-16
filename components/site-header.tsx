@@ -21,7 +21,7 @@ export async function SiteHeader() {
       : null;
 
   return (
-    <header className="sticky top-0 z-50 border-b border-teal-900/10 bg-white/90 shadow-sm backdrop-blur-md dark:border-teal-200/10 dark:bg-teal-950/90 dark:shadow-[0_1px_0_0_rgba(45,212,191,0.08)]">
+    <header className="sticky top-0 z-50 border-b border-[var(--border)] bg-[var(--surface)]/90 shadow-sm backdrop-blur-md supports-[backdrop-filter]:bg-[var(--surface)]/80">
       <SiteHeaderNav
         user={user}
         signOutAction={signOutAction}

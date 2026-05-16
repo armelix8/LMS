@@ -60,9 +60,9 @@ function IconProgress({ className }: { className?: string }) {
 }
 
 const trustItems = [
-  "Role-based access",
-  "Secure sessions",
-  "Progress visibility",
+  "Programs & courses",
+  "Labs & equipment",
+  "Community & mentorship",
 ];
 
 export default async function HomePage() {
@@ -87,16 +87,20 @@ export default async function HomePage() {
 
         <div className="relative mx-auto grid max-w-6xl gap-12 px-4 py-16 sm:px-6 sm:py-20 lg:grid-cols-[1fr_minmax(0,20rem)] lg:items-center lg:gap-16 lg:py-24">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-teal-800/90 dark:text-teal-300/90">
-              UniPod Learn
+            <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--ur-700)] dark:text-[var(--ur-300)]">
+              <span
+                aria-hidden
+                className="inline-block h-1.5 w-1.5 rounded-full bg-[var(--accent-400)]"
+              />
+              UR UniPod · University of Rwanda
             </p>
             <h1 className="mt-4 max-w-2xl text-balance text-4xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-5xl lg:text-[2.75rem] lg:leading-[1.12]">
-              A clear path from enrollment to measurable outcomes
+              Where ideas become prototypes — and innovators meet
             </h1>
             <p className="mt-5 max-w-xl text-pretty text-base leading-relaxed text-slate-600 dark:text-slate-400 sm:text-lg">
-              Deliver structured programs with modules, lessons, and
-              assessments—so learners stay on track and teams can see progress
-              at a glance.
+              UR UniPod is the University of Rwanda&apos;s innovation
+              community. Join programs, take courses, book labs and
+              makerspaces, and collaborate with peers, mentors, and staff.
             </p>
 
             <ul className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm text-slate-500 dark:text-slate-500">
@@ -113,46 +117,48 @@ export default async function HomePage() {
 
             <div className="mt-10 flex flex-wrap items-center gap-3">
               <Link
-                href="/courses"
-                className="inline-flex min-h-11 items-center justify-center rounded-lg bg-sky-600 px-6 text-sm font-semibold text-white shadow-md shadow-sky-900/10 transition hover:bg-sky-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--brand-accent)] dark:bg-sky-500 dark:hover:bg-sky-400"
+                href="/programs"
+                className="inline-flex min-h-11 items-center justify-center rounded-lg bg-[var(--brand-500)] px-6 text-sm font-semibold text-white shadow-md shadow-[var(--brand-900)]/15 transition hover:bg-[var(--brand-600)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent-400)]"
               >
-                Browse courses
+                Explore programs
               </Link>
               {session ? (
                 <Link
                   href="/dashboard"
-                  className="inline-flex min-h-11 items-center justify-center rounded-lg border border-slate-300/90 bg-white/80 px-6 text-sm font-semibold text-slate-800 backdrop-blur-sm transition hover:border-teal-700/20 hover:bg-white dark:border-slate-600 dark:bg-slate-800/80 dark:text-slate-100 dark:hover:border-teal-500/30 dark:hover:bg-slate-800"
+                  className="inline-flex min-h-11 items-center justify-center rounded-lg border border-[var(--border-strong)] bg-[var(--surface)]/80 px-6 text-sm font-semibold text-slate-800 backdrop-blur-sm transition hover:border-[var(--brand-500)]/40 hover:bg-[var(--surface)] dark:text-slate-100"
                 >
-                  Dashboard
+                  Go to dashboard
                 </Link>
               ) : (
                 <Link
                   href="/auth/signup"
-                  className="inline-flex min-h-11 items-center justify-center rounded-lg border border-slate-300/90 bg-white/80 px-6 text-sm font-semibold text-slate-800 backdrop-blur-sm transition hover:border-teal-700/20 hover:bg-white dark:border-slate-600 dark:bg-slate-800/80 dark:text-slate-100 dark:hover:border-teal-500/30 dark:hover:bg-slate-800"
+                  className="inline-flex min-h-11 items-center justify-center rounded-lg border border-[var(--border-strong)] bg-[var(--surface)]/80 px-6 text-sm font-semibold text-slate-800 backdrop-blur-sm transition hover:border-[var(--brand-500)]/40 hover:bg-[var(--surface)] dark:text-slate-100"
                 >
-                  Create account
+                  Join the community
                 </Link>
               )}
             </div>
           </div>
 
           <div className="relative mx-auto w-full max-w-sm lg:mx-0 lg:max-w-none">
-            <div className="rounded-2xl border border-teal-900/10 bg-white/70 p-6 shadow-[0_1px_0_rgba(15,118,110,0.06),0_24px_48px_-12px_rgba(15,23,42,0.12)] backdrop-blur-sm dark:border-teal-500/15 dark:bg-slate-900/60 dark:shadow-[0_24px_48px_-12px_rgba(0,0,0,0.45)]">
-              <div className="relative mx-auto aspect-[5/2] w-full max-w-[280px]">
-                <Image
-                  src="/brand/unipod-logo.png"
-                  alt="UniPod — University of Rwanda"
-                  fill
-                  className="object-contain object-left"
-                  sizes="280px"
-                  priority
-                />
+            <div className="overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--surface)]/80 shadow-[0_1px_0_rgba(2,132,199,0.06),0_24px_48px_-12px_rgba(15,23,42,0.15)] backdrop-blur-sm">
+              <div className="h-1 w-full bg-gradient-to-r from-[var(--brand-500)] via-[var(--accent-400)] to-[var(--ur-600)]" />
+              <div className="p-6">
+                <div className="relative mx-auto aspect-[5/2] w-full max-w-[280px]">
+                  <Image
+                    src="/brand/unipod-logo.png"
+                    alt="UR UniPod — University of Rwanda"
+                    fill
+                    className="object-contain object-left"
+                    sizes="280px"
+                    priority
+                  />
+                </div>
+                <p className="mt-5 border-t border-[var(--border)] pt-5 text-xs leading-relaxed text-[var(--muted-foreground)]">
+                  Official innovation community platform for the University of
+                  Rwanda — programs, courses, labs, and people, in one place.
+                </p>
               </div>
-              <p className="mt-5 border-t border-slate-200/90 pt-5 text-xs leading-relaxed text-slate-500 dark:border-slate-700 dark:text-slate-400">
-                Official learning environment for program delivery, learner
-                progress, and instructor-led content—aligned with institutional
-                standards.
-              </p>
             </div>
           </div>
         </div>
@@ -161,15 +167,16 @@ export default async function HomePage() {
       {/* Capabilities */}
       <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:py-24">
         <div className="max-w-2xl">
-          <h2 className="text-sm font-semibold uppercase tracking-wider text-sky-700 dark:text-sky-400">
-            Platform capabilities
+          <h2 className="text-sm font-semibold uppercase tracking-wider text-[var(--brand-700)] dark:text-[var(--brand-300)]">
+            What UR UniPod offers
           </h2>
           <p className="mt-2 text-2xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-3xl">
-            Built for programs that need structure and accountability
+            One platform for learning, building, and belonging
           </p>
           <p className="mt-3 text-base text-slate-600 dark:text-slate-400">
-            One place for content, access control, and visibility—without
-            sacrificing clarity for learners or staff.
+            Programs, courses, labs, and community — connected through a
+            single account so members can move from idea to prototype to
+            launch.
           </p>
         </div>
 
@@ -177,25 +184,25 @@ export default async function HomePage() {
           {[
             {
               Icon: IconRoles,
-              title: "Role-aware access",
-              body: "Students, instructors, and administrators each see what they need. Permissions are enforced on the server, not only in the UI.",
+              title: "Community & roles",
+              body: "Students, instructors, lab technicians, mentors and staff each get the right access — connected through one UR UniPod identity.",
             },
             {
               Icon: IconStructure,
-              title: "Structured learning paths",
-              body: "Organize material into modules and lessons with rich text and media. Learners move through content in a consistent, guided order.",
+              title: "Programs & courses",
+              body: "Structured innovation programs like the Prototype Development Program, plus modular courses for skills you build along the way.",
             },
             {
               Icon: IconProgress,
-              title: "Progress and assessment",
-              body: "Track completion and use assignments where appropriate so teams can review engagement and outcomes over time.",
+              title: "Labs & equipment",
+              body: "Discover UR UniPod labs and workshops, book makerspace time, reserve equipment, and track maintenance — all in one place.",
             },
           ].map(({ Icon, title, body }) => (
             <article
               key={title}
-              className="group flex flex-col rounded-2xl border border-slate-200/90 bg-white p-6 shadow-sm transition hover:border-teal-800/15 hover:shadow-md dark:border-slate-800 dark:bg-slate-900/40 dark:hover:border-teal-500/20"
+              className="group flex flex-col rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-6 shadow-sm transition hover:border-[var(--brand-500)]/40 hover:shadow-md"
             >
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-teal-50 text-teal-800 dark:bg-teal-950/80 dark:text-teal-300">
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[var(--brand-50)] text-[var(--brand-700)] dark:bg-[var(--brand-950)] dark:text-[var(--brand-300)]">
                 <Icon className="h-6 w-6" />
               </div>
               <h3 className="mt-5 text-lg font-semibold text-slate-900 dark:text-white">
@@ -210,25 +217,26 @@ export default async function HomePage() {
       </section>
 
       {/* Closing CTA */}
-      <section className="border-t border-teal-900/8 bg-gradient-to-b from-slate-50/80 to-transparent px-4 py-14 dark:border-teal-500/10 dark:from-slate-900/50 sm:px-6 sm:py-16">
+      <section className="border-t border-[var(--border)] bg-gradient-to-b from-[var(--surface-muted)] to-transparent px-4 py-14 sm:px-6 sm:py-16">
         <div className="mx-auto max-w-3xl text-center">
           <h2 className="text-xl font-bold text-slate-900 dark:text-white sm:text-2xl">
-            Ready to open a course?
+            Ready to build something at UR UniPod?
           </h2>
-          <p className="mx-auto mt-3 max-w-lg text-sm leading-relaxed text-slate-600 dark:text-slate-400">
-            Explore the catalog or sign in to continue where you left off.
+          <p className="mx-auto mt-3 max-w-lg text-sm leading-relaxed text-[var(--muted-foreground)]">
+            Browse programs and courses, or sign in to continue with your
+            workspace.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Link
-              href="/courses"
-              className="inline-flex min-h-11 items-center justify-center rounded-lg bg-sky-600 px-6 text-sm font-semibold text-white shadow-md transition hover:bg-sky-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--brand-accent)] dark:bg-sky-500 dark:hover:bg-sky-400"
+              href="/programs"
+              className="inline-flex min-h-11 items-center justify-center rounded-lg bg-[var(--brand-500)] px-6 text-sm font-semibold text-white shadow-md transition hover:bg-[var(--brand-600)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent-400)]"
             >
-              View catalog
+              Explore programs
             </Link>
             {!session && (
               <Link
                 href="/auth/signin"
-                className="inline-flex min-h-11 items-center justify-center rounded-lg px-5 text-sm font-semibold text-teal-800 underline-offset-4 hover:underline dark:text-teal-300"
+                className="inline-flex min-h-11 items-center justify-center rounded-lg px-5 text-sm font-semibold text-[var(--brand-700)] underline-offset-4 hover:underline dark:text-[var(--brand-300)]"
               >
                 Sign in
               </Link>

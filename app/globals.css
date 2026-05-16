@@ -1,35 +1,102 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
-/* UniPod brand — sky blue wordmark, yellow accent (i-dot), UR teal seal */
+/*
+ * UR UniPod brand system
+ * --------------------------------------------------------------
+ * Primary  : Sky blue (the "UR UniPod" wordmark)
+ * Accent   : Yellow (the dot above the "i")
+ * Secondary: UR teal (the University of Rwanda seal)
+ * Neutral  : Slate
+ *
+ * Use the semantic tokens (--surface, --border, --muted-foreground)
+ * for layout. Use --brand-* for the primary scale, --accent-* for
+ * highlights, --ur-* for the institutional teal.
+ */
+
 :root {
-  --background: #f0fdfa;
+  /* Brand: sky blue (UR UniPod wordmark) */
+  --brand-50: #f0f9ff;
+  --brand-100: #e0f2fe;
+  --brand-200: #bae6fd;
+  --brand-300: #7dd3fc;
+  --brand-400: #38bdf8;
+  --brand-500: #0ea5e9;
+  --brand-600: #0284c7;
+  --brand-700: #0369a1;
+  --brand-800: #075985;
+  --brand-900: #0c4a6e;
+  --brand-950: #082f49;
+
+  /* Accent: UR UniPod yellow (i-dot) */
+  --accent-300: #fde047;
+  --accent-400: #facc15;
+  --accent-500: #eab308;
+  --accent-600: #ca8a04;
+
+  /* University of Rwanda teal (seal) */
+  --ur-300: #5eead4;
+  --ur-400: #2dd4bf;
+  --ur-500: #14b8a6;
+  --ur-600: #0d9488;
+  --ur-700: #0f766e;
+  --ur-800: #115e59;
+  --ur-900: #134e4a;
+
+  /* Semantic tokens (light) */
+  --background: #ffffff;
   --foreground: #0f172a;
-  --brand: #0ea5e9;
-  --brand-muted: #38bdf8;
-  --brand-strong: #0284c7;
-  --brand-accent: #facc15;
-  --brand-teal: #0f766e;
-  --brand-teal-dark: #115e59;
+  --surface: #ffffff;
+  --surface-muted: #f8fafc;
+  --surface-subtle: #f1f5f9;
+  --border: #e2e8f0;
+  --border-strong: #cbd5e1;
+  --muted-foreground: #475569;
+
+  /* Back-compat aliases for existing components */
+  --brand: var(--brand-500);
+  --brand-muted: var(--brand-400);
+  --brand-strong: var(--brand-600);
+  --brand-accent: var(--accent-400);
+  --brand-teal: var(--ur-700);
+  --brand-teal-dark: var(--ur-800);
+
+  /* Focus ring used across the app */
+  --ring: var(--brand-500);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-border: var(--border);
+  --color-brand: var(--brand-500);
+  --color-brand-foreground: #ffffff;
+  --color-accent: var(--accent-400);
+  --color-accent-foreground: #1f1300;
+  --color-ur: var(--ur-700);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0f172a;
+    --background: #0b1220;
     --foreground: #f1f5f9;
-    --brand: #38bdf8;
-    --brand-muted: #7dd3fc;
-    --brand-strong: #0ea5e9;
-    --brand-accent: #fde047;
-    --brand-teal: #2dd4bf;
-    --brand-teal-dark: #5eead4;
+    --surface: #0f172a;
+    --surface-muted: #111c30;
+    --surface-subtle: #15233b;
+    --border: #1f2a3d;
+    --border-strong: #2a3957;
+    --muted-foreground: #94a3b8;
+
+    --brand: var(--brand-400);
+    --brand-muted: var(--brand-300);
+    --brand-strong: var(--brand-500);
+    --brand-accent: var(--accent-300);
+    --brand-teal: var(--ur-400);
+    --brand-teal-dark: var(--ur-300);
+    --ring: var(--brand-400);
   }
 }
 
@@ -37,4 +104,47 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-geist-sans), system-ui, sans-serif;
+}
+
+/* Reusable brand utility classes */
+@layer components {
+  .btn-brand {
+    background-color: var(--brand-500);
+    color: #ffffff;
+    border-radius: 0.5rem;
+    padding: 0.625rem 1.25rem;
+    font-weight: 600;
+    transition: background-color 150ms ease, transform 150ms ease,
+      box-shadow 150ms ease;
+    box-shadow: 0 1px 0 rgba(2, 132, 199, 0.08),
+      0 8px 16px -8px rgba(2, 132, 199, 0.35);
+  }
+  .btn-brand:hover {
+    background-color: var(--brand-600);
+  }
+  .btn-brand:focus-visible {
+    outline: 2px solid var(--accent-400);
+    outline-offset: 2px;
+  }
+  .btn-brand:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .btn-outline {
+    background-color: transparent;
+    color: var(--brand-700);
+    border: 1px solid var(--brand-600);
+    border-radius: 0.5rem;
+    padding: 0.5rem 1rem;
+    font-weight: 600;
+    transition: background-color 150ms ease, color 150ms ease;
+  }
+  .btn-outline:hover {
+    background-color: var(--brand-50);
+  }
+
+  .ring-brand {
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand-500) 35%, transparent);
+  }
 }

@@ -69,9 +69,38 @@ export default async function ProgramPublicPage({
   const closedCohorts = program.cohorts.filter(
     (c) => !cohortApplicationsWindowOpen(c),
   );
+  const isAdmin = session?.user?.role === "ADMIN";
 
   return (
     <main className="flex-1">
+      {isAdmin ? (
+        <div className="border-b border-[var(--brand-500)]/20 bg-gradient-to-r from-[var(--brand-50)] to-[var(--accent-400)]/10 dark:from-[var(--brand-950)] dark:to-transparent">
+          <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
+            <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[var(--brand-700)] dark:text-[var(--brand-300)]">
+              <span
+                aria-hidden
+                className="inline-block h-1.5 w-1.5 rounded-full bg-[var(--accent-400)]"
+              />
+              Admin view
+            </p>
+            <div className="flex flex-wrap items-center gap-2">
+              <Link
+                href={`/admin/programs/${program.id}`}
+                className="inline-flex items-center gap-1.5 rounded-md bg-[var(--brand-500)] px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:bg-[var(--brand-600)]"
+              >
+                <span aria-hidden>⚙</span> Manage program
+              </Link>
+              <Link
+                href="/admin/programs"
+                className="inline-flex items-center rounded-md border border-[var(--border-strong)] bg-[var(--surface)] px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:border-[var(--brand-500)]/40 hover:text-[var(--brand-700)] dark:text-slate-200"
+              >
+                All programs (admin)
+              </Link>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
       {sp.applyError ? (
         <div className="border-b border-red-200/80 bg-red-50/90 dark:border-red-900/40 dark:bg-red-950/30">
           <p

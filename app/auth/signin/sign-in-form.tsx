@@ -42,7 +42,7 @@ export function SignInForm({ googleEnabled }: Props) {
             type="button"
             disabled={pending}
             onClick={() => signIn("google", { callbackUrl })}
-            className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white py-3 text-sm font-medium text-slate-800 shadow-sm transition hover:bg-slate-50 disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800"
+            className="flex w-full items-center justify-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--surface)] py-3 text-sm font-medium text-slate-800 shadow-sm transition hover:bg-[var(--surface-subtle)] disabled:opacity-50 dark:text-slate-100"
           >
             <svg className="h-5 w-5" viewBox="0 0 24 24" aria-hidden>
               <path
@@ -66,10 +66,10 @@ export function SignInForm({ googleEnabled }: Props) {
           </button>
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-slate-200 dark:border-slate-700" />
+              <div className="w-full border-t border-[var(--border)]" />
             </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-[var(--background)] px-2 text-slate-500">
+            <div className="relative flex justify-center text-xs uppercase tracking-wider">
+              <span className="bg-[var(--surface)] px-2 text-[var(--muted-foreground)]">
                 Or continue with email
               </span>
             </div>
@@ -98,7 +98,7 @@ export function SignInForm({ googleEnabled }: Props) {
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 shadow-sm outline-none ring-indigo-500 focus:ring-2 dark:border-slate-600 dark:bg-slate-900 dark:text-white"
+            className="mt-1 w-full rounded-lg border border-[var(--border-strong)] bg-[var(--surface)] px-3 py-2 text-slate-900 shadow-sm outline-none transition focus:border-[var(--brand-500)] focus:ring-2 focus:ring-[var(--brand-500)]/30 dark:text-white"
           />
         </div>
         <div>
@@ -116,13 +116,13 @@ export function SignInForm({ googleEnabled }: Props) {
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 shadow-sm outline-none ring-indigo-500 focus:ring-2 dark:border-slate-600 dark:bg-slate-900 dark:text-white"
+            className="mt-1 w-full rounded-lg border border-[var(--border-strong)] bg-[var(--surface)] px-3 py-2 text-slate-900 shadow-sm outline-none transition focus:border-[var(--brand-500)] focus:ring-2 focus:ring-[var(--brand-500)]/30 dark:text-white"
           />
         </div>
         <button
           type="submit"
           disabled={pending}
-          className="w-full rounded-xl bg-indigo-600 py-3 text-sm font-semibold text-white transition hover:bg-indigo-500 disabled:opacity-50"
+          className="w-full rounded-xl bg-[var(--brand-500)] py-3 text-sm font-semibold text-white shadow-sm shadow-[var(--brand-900)]/20 transition hover:bg-[var(--brand-600)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent-400)] disabled:opacity-50"
         >
           {pending ? "Signing in…" : "Sign in"}
         </button>
